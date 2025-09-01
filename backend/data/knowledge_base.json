@@ -1,0 +1,144 @@
+{
+  "rentalAgreement": [
+    {
+      "clauseType": "securityDeposit",
+      "idealText": "The security deposit shall not exceed two months' rent for residential premises and six months' rent for non-residential premises. The deposit must be refunded to the tenant on the date of taking over vacant possession, after making due deductions for any tenant liabilities.",
+      "explanation": "This clause governs the security deposit, a sum paid by the tenant as a safeguard for the landlord. The law protects the tenant by capping the maximum amount and ensuring its timely return.",
+      "commonRisks": [
+        "Excessive Deposit Amount: The landlord asks for more than two months' rent for a home.",
+        "Vague Refund Timeline: The agreement does not specify when the deposit will be returned.",
+        "Unfair Deductions: The agreement allows deductions for 'normal wear and tear' or 'general painting', which is not permitted. Deductions should only be for actual damages caused by the tenant."
+      ],
+      "redFlagsInUserClause": [
+        "security deposit exceeds two months' rent",
+        "no refund timeline mentioned",
+        "non-refundable deposit",
+        "deductions for normal wear and tear"
+      ],
+      "suggestedWording": "To ensure fairness, suggest adding: 'An itemized list of all deductions from the security deposit, along with corresponding receipts for repairs, will be provided to the tenant within 30 days of vacating the premises.'",
+      "source": "The Model Tenancy Act, 2021, Chapter III, Section 11."
+    },
+    {
+      "clauseType": "landlordEntry",
+      "idealText": "The landlord or property manager must provide the tenant with a notice, in writing or via electronic mode, at least twenty-four hours before entering the premises. The entry must be between sunrise and sunset and for a reasonable cause like repairs or inspection.",
+      "explanation": "This clause protects the tenant's privacy. It prevents the landlord from entering the property whenever they wish, establishing a clear and fair procedure for access.",
+      "commonRisks": [
+        "No Notice Period: The agreement allows the landlord to enter at any time without prior notice.",
+        "Vague Reasons for Entry: The agreement uses unclear language like 'for inspection purposes' without defining the frequency.",
+        "No Time Restrictions: The landlord is not restricted from entering late at night or very early in the morning."
+      ],
+      "redFlagsInUserClause": [
+        "enter at any time",
+        "without notice",
+        "unrestricted access",
+        "inspect without reason"
+      ],
+      "suggestedWording": "Suggest amending the clause to state: 'The landlord may enter the premises after providing a written notice of at least 24 hours, specifying the reason and a proposed time of entry, which shall be between 8 AM and 7 PM.'",
+      "source": "The Model Tenancy Act, 2021, Chapter IV, Section 17."
+    },
+    {
+      "clauseType": "maintenanceAndRepairs",
+      "idealText": "The landlord is responsible for major structural repairs, whitewashing, and major plumbing/electrical wiring. The tenant is responsible for minor repairs like changing tap washers, drain cleaning, and switch/socket repairs.",
+      "explanation": "This clause clearly divides the responsibility for property upkeep. It ensures the landlord maintains the structural integrity, while the tenant handles day-to-day minor maintenance.",
+      "commonRisks": [
+        "Shifting Responsibility: The agreement tries to make the tenant responsible for major structural repairs or whitewashing.",
+        "Vague Language: The agreement does not clearly list which party is responsible for specific types of repairs."
+      ],
+      "redFlagsInUserClause": [
+        "tenant is responsible for all repairs",
+        "structural repairs by tenant",
+        "whitewashing by tenant"
+      ],
+      "suggestedWording": "Ensure the agreement explicitly lists responsibilities, ideally by attaching the Second Schedule of the Model Tenancy Act as an annexure.",
+      "source": "The Model Tenancy Act, 2021, Chapter IV, Section 15 and The Second Schedule."
+    },
+    {
+      "clauseType": "rentIncrease",
+      "idealText": "The revision of rent shall be in accordance with the terms of the tenancy agreement. Any increase in rent requires a prior written agreement between the landlord and tenant before the work is commenced for any improvement or structural alteration.",
+      "explanation": "This clause governs how and when the rent can be increased. Any revision must be mutually agreed upon in the tenancy agreement, preventing sudden and arbitrary rent hikes by the landlord.",
+      "commonRisks": [
+        "Arbitrary Increases: The agreement allows the landlord to increase rent at their discretion or with a very short notice period.",
+        "No Cap on Increase: There is no limit mentioned on how much the rent can be increased annually.",
+        "Increase for Non-structural Repairs: The landlord tries to increase rent for routine maintenance which is their own responsibility."
+      ],
+      "redFlagsInUserClause": [
+        "rent may be increased at any time",
+        "subject to annual increase",
+        "at the landlord's discretion"
+      ],
+      "suggestedWording": "Suggest adding a clause like: 'The rent will be fixed for the first 12 months and may be increased by a maximum of 10% thereafter, with a written notice of at least three months provided to the tenant.'",
+      "source": "The Model Tenancy Act, 2021, Chapter III, Section 9."
+    },
+    {
+      "clauseType": "terminationAndEviction",
+      "idealText": "A tenant may terminate the tenancy by giving a notice of at least one month. A landlord can only evict a tenant on specific grounds, such as non-payment of rent for two consecutive months, or misuse of the property, and must obtain an order from the Rent Court.",
+      "explanation": "This clause defines the legal process for ending the tenancy. It protects the tenant from being unfairly or suddenly thrown out of the property, ensuring a formal process is followed.",
+      "commonRisks": [
+        "Short Notice Period for Tenant: The landlord can terminate the agreement with a very short notice (e.g., one week).",
+        "Vague Grounds for Eviction: The agreement lists unclear reasons for eviction like 'landlord's dissatisfaction'.",
+        "No Court Order Required: The clause implies the landlord can evict the tenant without a formal order from the Rent Court."
+      ],
+      "redFlagsInUserClause": [
+        "landlord may terminate at any time",
+        "eviction for any reason",
+        "must vacate immediately upon notice"
+      ],
+      "suggestedWording": "Ensure the clause clearly states the specific grounds for eviction as listed in the Model Tenancy Act and requires a minimum notice period of 30 days for either party to terminate the agreement.",
+      "source": "The Model Tenancy Act, 2021, Chapter V, Section 21 and Chapter VI, Section 29."
+    }
+  ],
+  "freelanceContract": [
+    {
+      "clauseType": "paymentTerms",
+      "idealText": "Client agrees to pay the freelancer within 15 days of receiving a valid invoice. Invoices will be submitted upon completion of agreed-upon milestones. Late payments will be subject to a penalty of 1.5% per month on the outstanding amount.",
+      "explanation": "This clause is critical for ensuring the freelancer gets paid on time. It sets clear expectations for when invoices are sent, when payment is due, and what happens if the payment is late.",
+      "commonRisks": [
+        "Net 60/90 Terms: Long payment cycles like 'Net 60' (payment due 60 days after invoice) which can hurt a freelancer's cash flow.",
+        "Vague Milestones: Unclear definitions of when a project stage is 'complete', leading to delayed invoicing.",
+        "No Late Fee Clause: Without a penalty for late payments, there is little incentive for the client to pay on time."
+      ],
+      "redFlagsInUserClause": [
+        "payment upon completion of all work",
+        "net 60",
+        "net 90",
+        "payment at client's discretion"
+      ],
+      "suggestedWording": "Suggest breaking the project into milestones with specific deliverables and payment amounts for each. For example: '25% upon project kickoff, 50% upon delivery of first draft, 25% upon final approval.'",
+      "source": "Industry Best Practice."
+    },
+    {
+      "clauseType": "scopeOfWork",
+      "idealText": "The freelancer will provide the following services: [Detailed list of services]. This agreement includes two rounds of revisions. Any work requested beyond these services will be considered out of scope and will require a separate agreement or addendum at an additional fee.",
+      "explanation": "This clause, often called a Statement of Work (SOW), clearly defines the exact deliverables of the project. It protects the freelancer from 'scope creep'—the client asking for more and more work that wasn't originally agreed upon.",
+      "commonRisks": [
+        "Vague Descriptions: Using terms like 'general marketing assistance' or 'website design' without specifics.",
+        "Unlimited Revisions: A clause that allows for endless changes from the client without extra payment.",
+        "No Process for Changes: The contract doesn't specify how to handle requests for extra work."
+      ],
+      "redFlagsInUserClause": [
+        "unlimited revisions",
+        "as required by the client",
+        "and other related tasks"
+      ],
+      "suggestedWording": "For every deliverable, use specific, measurable terms. For example, instead of 'write blog posts', use 'write four (4) 800-word blog posts on topics provided by the client, including SEO optimization'.",
+      "source": "Industry Best Practice."
+    },
+    {
+      "clauseType": "intellectualProperty",
+      "idealText": "Upon final payment, the freelancer assigns all rights and ownership of the final deliverables to the client. The freelancer retains the right to display the work in their portfolio and for self-promotional purposes.",
+      "explanation": "This clause clarifies who owns the work after it's done. Typically, the client owns the final product once they've paid for it, but the freelancer should retain the right to use it as a work sample.",
+      "commonRisks": [
+        "No Portfolio Rights: The agreement forbids the freelancer from ever showing the work they created.",
+        "All-Encompassing IP Transfer: Vague language that might transfer ownership of the freelancer's tools, processes, or even preliminary ideas, not just the final product.",
+        "Delayed Transfer: IP rights only transfer long after final payment, leaving the freelancer in a vulnerable position."
+      ],
+      "redFlagsInUserClause": [
+        "all intellectual property whatsoever",
+        "work for hire",
+        "freelancer shall not display"
+      ],
+      "suggestedWording": "Ensure the clause specifies that IP transfer is contingent upon 'receipt of full and final payment'. Also, explicitly add: 'Freelancer retains all rights to their pre-existing intellectual property and proprietary tools.'",
+      "source": "Industry Best Practice."
+    }
+  ]
+}
