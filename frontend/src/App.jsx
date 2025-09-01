@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import HomePage from './Home';
-import DashboardPage from './Dashboard';
-import ProfilePage from './Profile';
+import HomePage from './pages/Home';
+import DashboardPage from './pages/Dashboard';
+import ProfilePage from './pages/Profile';
 import './index.css'; // Make sure the path is correct
 
 // ~~~~~~~~~~~~~~~~~~~~~~~ BACKGROUND EFFECTS COMPONENT ~~~~~~~~~~~~~~~~~~~~~~~
