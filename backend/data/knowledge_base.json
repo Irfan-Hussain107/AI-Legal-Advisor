@@ -140,5 +140,367 @@
       "suggestedWording": "Ensure the clause specifies that IP transfer is contingent upon 'receipt of full and final payment'. Also, explicitly add: 'Freelancer retains all rights to their pre-existing intellectual property and proprietary tools.'",
       "source": "Industry Best Practice."
     }
+  ],
+  "landAgreement": [
+    {
+      "clauseType": "titleAssurance",
+      "idealText": "The Seller hereby covenants and assures the Buyer that they have a clear, marketable, and undisputed title to the Property and that it is free from all encumbrances, charges, mortgages, litigation, or any other legal claims. The Seller shall produce all original title deeds and relevant documents to the Buyer at the time of execution of the Sale Deed.",
+      "explanation": "This clause is foundational for any land transaction. It's a guarantee from the seller that they are the legal and rightful owner of the property and that no third party has any claims or rights over it. This gives the buyer legal protection against future disputes.",
+      "commonRisks": [
+        "Seller's Title is Defective: The seller's ownership is not clear due to a missing link in the chain of ownership (Mother Deed).",
+        "Undisclosed Encumbrances: The property has a hidden mortgage or legal lien on it that the seller failed to disclose.",
+        "Ongoing Legal Disputes: There is an active court case related to the property that could affect ownership."
+      ],
+      "redFlagsInUserClause": [
+        "seller's title is not verified",
+        "fails to mention all encumbrances",
+        "title is not 'marketable'",
+        "documents are not handed over"
+      ],
+      "suggestedWording": "To ensure comprehensive protection, suggest adding: 'The Seller indemnifies the Buyer against any loss or damage arising from any defect in the title or any undisclosed encumbrances, and shall be liable to compensate the Buyer for such loss at the prevailing market rate.'",
+      "source": "Indian Registration Act, 1908 & Industry Best Practices."
+    },
+    {
+      "clauseType": "paymentAndConsideration",
+      "idealText": "The total sale consideration for the Property is Rupees [Amount in Words] (₹[Amount in Figures]). The Buyer has paid a sum of Rupees [Advance Amount in Words] (₹[Advance Amount in Figures]) as an advance (earnest money), the receipt of which the Seller acknowledges. The balance amount of Rupees [Balance Amount in Words] (₹[Balance Amount in Figures]) shall be paid by the Buyer to the Seller on or before the date of registration of the Sale Deed.",
+      "explanation": "This clause clearly defines the total purchase price of the land, how much has been paid upfront as a token amount, and when the remaining balance is due. It prevents financial disputes by establishing a clear payment schedule.",
+      "commonRisks": [
+        "Vague Payment Schedule: The agreement does not specify a clear timeline for the balance payment, leading to potential delays.",
+        "Mismatch in Amounts: The amount in words does not match the amount in figures, which can lead to legal complications.",
+        "Lack of Acknowledgment: The seller does not formally acknowledge the receipt of the advance payment in the agreement."
+      ],
+      "redFlagsInUserClause": [
+        "payment schedule is not defined",
+        "amount is only in figures",
+        "receipt of earnest money not mentioned"
+      ],
+      "suggestedWording": "To add a layer of security, suggest specifying the payment method, for example, 'The balance payment shall be made via bank transfer or a demand draft.' Also, add a clear consequence for non-payment, such as: 'Failure to pay the balance amount within the stipulated time will result in the forfeiture of the earnest money paid by the Buyer.'",
+      "source": "Transfer of Property Act, 1882, and local stamp duty guidelines."
+    },
+    {
+      "clauseType": "possessionAndDelivery",
+      "idealText": "The Seller agrees to hand over the absolute and vacant physical possession of the Property to the Buyer on the date of execution of the Sale Deed, free from all encumbrances, occupants, tenants, and any other third-party claims.",
+      "explanation": "This clause outlines the process for transferring physical control of the land from the seller to the buyer. It ensures that the buyer receives the property in the agreed-upon condition—empty and ready for use—at the same time they receive legal ownership.",
+      "commonRisks": [
+        "Delayed Possession: The seller fails to hand over the property on the agreed date, causing delays for the buyer's plans.",
+        "Property Still Occupied: The land is still occupied by tenants or others, forcing the buyer to take legal action to remove them.",
+        "Possession Before Registration: The buyer takes possession of the land before the Sale Deed is registered, which can put them in a vulnerable legal position."
+      ],
+      "redFlagsInUserClause": [
+        "vacant possession not mentioned",
+        "possession date is not specified",
+        "mentions possession only after a certain event without a clear timeline"
+      ],
+      "suggestedWording": "To add certainty, suggest adding: 'In the event the Seller fails to deliver vacant possession on the agreed date, they shall pay a daily penalty of ₹[Amount] to the Buyer until possession is handed over.'",
+      "source": "Transfer of Property Act, 1882."
+    },
+    {
+      "clauseType": "indemnity",
+      "idealText": "The Seller agrees to indemnify and keep the Buyer indemnified against any loss, damages, costs, or expenses that the Buyer may incur due to any defect in the Seller's title, undisclosed encumbrances, or any other breach of the Seller's representations and warranties under this Agreement.",
+      "explanation": "This clause is a promise by the seller to compensate the buyer for any financial loss that may arise from a problem with the property's title or any other issue that was not disclosed during the sale. It is a critical protection for the buyer.",
+      "commonRisks": [
+        "Seller's liability is capped at a low amount.",
+        "The clause is one-sided, protecting only the seller.",
+        "Vague language that does not specify what constitutes a 'breach' or 'loss'."
+      ],
+      "redFlagsInUserClause": [
+        "seller's indemnity limited to the sale price",
+        "does not mention compensation for legal costs",
+        "indemnity period is too short"
+      ],
+      "suggestedWording": "To strengthen the clause, suggest adding: 'This indemnity shall remain in full force and effect indefinitely, regardless of the completion of the sale.'",
+      "source": "Indian Contract Act, 1872, Section 124."
+    },
+    {
+      "clauseType": "disputeResolution",
+      "idealText": "Any dispute or difference whatsoever arising between the parties out of or relating to the construction, meaning, scope, or operation of this Agreement or the breach thereof shall be settled by mutual negotiation. If the dispute is not resolved within 30 days, it shall be referred to arbitration under the provisions of the Arbitration and Conciliation Act, 1996.",
+      "explanation": "This clause establishes a clear process for resolving conflicts that may arise between the buyer and seller. It typically prioritizes negotiation first, followed by arbitration, to avoid costly and time-consuming court litigation.",
+      "commonRisks": [
+        "No clear process for escalation (e.g., from negotiation to arbitration).",
+        "Clause is too generic and doesn't specify the rules or location of arbitration.",
+        "Mandates court litigation directly, which can be expensive."
+      ],
+      "redFlagsInUserClause": [
+        "no mention of a timeframe for negotiation",
+        "arbitration rules not specified",
+        "jurisdiction is not defined"
+      ],
+      "suggestedWording": "To ensure clarity and fairness, suggest adding: 'The arbitration proceedings shall be conducted by a sole arbitrator appointed by mutual consent of the parties, and the seat of arbitration shall be [City, State].'",
+      "source": "Arbitration and Conciliation Act, 1996."
+    },
+    {
+      "clauseType": "mutationAndTaxes",
+      "idealText": "The Seller assures that all property taxes, cesses, and other government dues related to the Property have been paid up to the date of execution of the Sale Deed. The Buyer shall be responsible for all such payments from the date of the Sale Deed, including all costs associated with the mutation of the Property in their name.",
+      "explanation": "This clause clarifies who is responsible for paying property taxes and other government fees before and after the sale. It also assigns the responsibility for the mutation process—the official update of land records—to the new owner.",
+      "commonRisks": [
+        "The seller has outstanding tax dues that the buyer unknowingly inherits.",
+        "The agreement is silent on who is responsible for the mutation process.",
+        "Vague wording regarding 'all dues,' which could lead to disputes over un-covered expenses."
+      ],
+      "redFlagsInUserClause": [
+        "doesn't mention prior tax payment by seller",
+        "mutation process is not addressed",
+        "responsibility for stamp duty and registration fees is not clearly assigned"
+      ],
+      "suggestedWording": "To prevent disputes, suggest adding: 'The Seller shall provide the Buyer with the original receipts for all property tax payments made up to the date of this Agreement as proof of payment.'",
+      "source": "Indian Registration Act, 1908 & State Land Revenue Codes."
+    },
+    {
+      "clauseType": "forceMajeure",
+      "idealText": "Neither party shall be liable for any failure to perform its obligations under this Agreement if such failure is due to a Force Majeure Event, including but not limited to acts of God, war, civil unrest, fire, flood, or any government action that prevents or delays performance. In such an event, the affected party must notify the other party and the performance timeline shall be extended accordingly.",
+      "explanation": "This clause protects both parties from liability for delays or non-performance caused by events that are beyond their control. It ensures that the agreement can be paused or re-negotiated without penalty if an unforeseen, major event occurs.",
+      "commonRisks": [
+        "Vague definition of 'Force Majeure' that a party could misuse to justify any delay.",
+        "No requirement for the affected party to provide notice of the event.",
+        "The clause does not specify a timeline for resuming the agreement or a process for termination if the event is prolonged."
+      ],
+      "redFlagsInUserClause": [
+        "does not list specific events (e.g., natural disasters)",
+        "no notification requirement for the affected party",
+        "no provision for terminating the agreement after a prolonged event"
+      ],
+      "suggestedWording": "To provide a clear exit strategy, suggest adding: 'If a Force Majeure Event persists for more than 90 days, either party shall have the right to terminate this Agreement without penalty, and all amounts paid, including the earnest money, shall be refunded to the Buyer within 30 days.'",
+      "source": "Indian Contract Act, 1872."
+    },
+    {
+      "clauseType": "rightToCallOff",
+      "idealText": "The Buyer shall have the right to terminate this Agreement without penalty if, upon due diligence, they discover any material defect in the Property or its title, or if they are unable to secure a home loan for reasons attributable to the Property's legal status.",
+      "explanation": "This is a critical protection for the buyer. It gives them a clear exit strategy if they find a major problem with the property or its legal status after conducting their due diligence, such as a title search or a bank's loan verification.",
+      "commonRisks": [
+        "The clause is not included, leaving the buyer no recourse if a problem is discovered.",
+        "The clause is too vague about what constitutes a 'material defect.'",
+        "The buyer must forfeit the earnest money even if the problem is with the property itself."
+      ],
+      "redFlagsInUserClause": [
+        "no conditions for buyer to cancel without penalty",
+        "forfeits earnest money regardless of the reason for cancellation",
+        "doesn't allow cancellation based on legal issues"
+      ],
+      "suggestedWording": "To make this a fair and robust clause, suggest adding a reciprocal right for the seller: 'Similarly, the Seller shall have the right to terminate this Agreement if the Buyer fails to make the payments as per the schedule, and the earnest money shall be forfeited.'",
+      "source": "Indian Contract Act, 1872 & Real Estate Industry Best Practices."
+    }
+  ],
+  "will": [
+    {
+      "clauseType": "Declaration",
+      "idealText": "I, [Testator's Full Name], son/daughter of [Father's Name], currently residing at [Full Address], aged about [Age] years, being of sound mind and memory and in full possession of my senses, do hereby make and declare this as my last Will and Testament, revoking all previous Wills and codicils made by me.",
+      "explanation": "This is the foundational clause of a Will. It identifies the person making the Will (the 'Testator'), confirms their mental capacity to do so, and explicitly revokes any prior Wills to ensure there is no confusion as to which document is legally binding.",
+      "commonRisks": [
+        "Testator's identity is not clearly stated, which could lead to disputes.",
+        "No statement confirming the Testator is of 'sound mind,' leaving the Will open to challenges of undue influence or incapacity.",
+        "Prior Wills are not explicitly revoked, which can cause confusion and legal challenges."
+      ],
+      "redFlagsInUserClause": [
+        "No mention of the Testator's mental state.",
+        "Lack of a clear revocation statement.",
+        "Vague personal details (e.g., using a nickname instead of a full legal name)."
+      ],
+      "suggestedWording": "To strengthen this clause, suggest adding: 'I declare that this Will is made by me of my own free will and volition, without any coercion or undue influence from any person whatsoever.'",
+      "source": "Indian Succession Act, 1925, Sections 59 & 63."
+    },
+    {
+      "clauseType": "Appointment of Executor",
+      "idealText": "I hereby appoint [Executor's Full Name], son/daughter of [Father's Name], currently residing at [Full Address], as the sole Executor of this my Will. In case he/she predeceases me or is unable or unwilling to act, I appoint [Alternate Executor's Full Name] as the alternate Executor.",
+      "explanation": "The Executor is responsible for carrying out the Testator's wishes. This includes paying off debts, managing assets, and distributing property to the beneficiaries. Appointing an alternate executor is a prudent step to ensure the smooth execution of the Will.",
+      "commonRisks": [
+        "No Executor is named, requiring a court to appoint an administrator, which is a lengthy process.",
+        "The appointed Executor is a minor or otherwise legally incompetent.",
+        "No alternate Executor is named, leaving the estate in limbo if the primary Executor is unable to serve."
+      ],
+      "redFlagsInUserClause": [
+        "The appointed Executor is also a witness to the Will, which can invalidate their appointment.",
+        "Lack of an alternate or contingent Executor.",
+        "The Executor's details are incomplete or incorrect, making them difficult to locate."
+      ],
+      "suggestedWording": "To provide more clarity, suggest adding: 'My Executor shall have all the powers necessary to manage, sell, or dispose of my property as required to fulfill the bequests set forth in this Will.'",
+      "source": "Indian Succession Act, 1925, Section 222."
+    },
+    {
+      "clauseType": "Bequests and Distribution of Assets",
+      "idealText": "I bequeath my immovable property located at [Property Address] to my son, [Son's Name]. I bequeath my bank account bearing A/c No. [Account Number] at [Bank Name] to my daughter, [Daughter's Name]. All my remaining assets, including jewelry, investments, and other movable property, shall be distributed equally between my two children.",
+      "explanation": "This clause outlines the specific distribution of the Testator's assets to the named beneficiaries. It's crucial to be clear and precise in describing both the assets and the beneficiaries to prevent disputes.",
+      "commonRisks": [
+        "Vague description of assets (e.g., 'all my jewelry' without specifying location).",
+        "Failure to account for all assets, leaving a portion of the estate subject to intestacy laws.",
+        "Gifting a property that is jointly owned without specifying the Testator's share."
+      ],
+      "redFlagsInUserClause": [
+        "Assets are not clearly identified (e.g., using 'my car' when the Testator owns multiple cars).",
+        "Ambiguous language that could be interpreted in multiple ways.",
+        "A beneficiary is not clearly identified (e.g., referring to a 'friend' without a name)."
+      ],
+      "suggestedWording": "To ensure clarity, suggest listing all major assets with specific details (e.g., property registration number, bank account details) and adding a 'Residuary Clause' to cover any assets not explicitly mentioned.",
+      "source": "Indian Succession Act, 1925, Sections 74 & 75."
+    },
+    {
+      "clauseType": "Appointment of Guardian",
+      "idealText": "I appoint my sister, [Guardian's Full Name], daughter of [Father's Name], currently residing at [Full Address], as the legal guardian of my minor children, [Child 1's Name] and [Child 2's Name], until they attain the age of majority.",
+      "explanation": "This clause allows a parent to legally appoint a guardian for their minor children in the event of their death. Without this, a court would make the decision, which may not align with the parent's wishes. It provides clarity and avoids potential disputes among family members.",
+      "commonRisks": [
+        "No guardian is appointed, leaving the decision to a court.",
+        "The appointed guardian is unable or unwilling to serve.",
+        "Failing to appoint an alternate guardian in case the primary one is unavailable."
+      ],
+      "redFlagsInUserClause": [
+        "The guardian is not clearly identified or their relationship to the Testator is not specified.",
+        "There is no provision for a contingency if the primary guardian cannot act.",
+        "The clause does not specify for whom the guardian is appointed."
+      ],
+      "suggestedWording": "To ensure certainty, suggest adding: 'I request that my appointed guardian shall have full legal custody and control over the persons and education of my minor children. I also appoint [Alternate Guardian's Full Name] as the alternate guardian if [Primary Guardian's Full Name] is unable to act.'",
+      "source": "Hindu Minority and Guardianship Act, 1956, and Indian Succession Act, 1925."
+    },
+    {
+      "clauseType": "Residuary",
+      "idealText": "All the rest, residue, and remainder of my estate, both movable and immovable, wheresoever and whatsoever situated, which is not specifically bequeathed by this Will, I give, devise, and bequeath to [Residuary Beneficiary's Full Name].",
+      "explanation": "A residuary clause is an essential safety net in a Will. It covers any assets the Testator may have forgotten to mention, or those acquired after the Will was made. Without this clause, any unmentioned property would be distributed according to the laws of intestacy, which could lead to complications and disputes.",
+      "commonRisks": [
+        "The Testator fails to include a residuary clause, leaving some property 'undisposed' and subject to intestacy laws.",
+        "The residuary beneficiary predeceases the Testator without a contingent plan."
+      ],
+      "redFlagsInUserClause": [
+        "No mention of what happens to assets not explicitly bequeathed.",
+        "Vague language regarding the remainder of the estate."
+      ],
+      "suggestedWording": "To make the clause more comprehensive, suggest adding: 'If [Residuary Beneficiary's Name] predeceases me, the residuary estate shall be distributed equally among my legal heirs as per the laws of intestacy.'",
+      "source": "Indian Succession Act, 1925, Section 102."
+    },
+    {
+      "clauseType": "Witness and Attestation",
+      "idealText": "We, the undersigned, have at the same time seen [Testator's Full Name], the Testator, sign and execute this Will, and have signed our names as witnesses in his/her presence, and in the presence of each other, at the same time. We are of sound mind and over the age of eighteen years.",
+      "explanation": "This clause is a legal requirement for a valid Will in India. It confirms that the witnesses saw the Testator sign the Will and that they signed it in the Testator's and each other's presence. This is a crucial safeguard against fraud or coercion.",
+      "commonRisks": [
+        "The witnesses are also beneficiaries of the Will, which can void the bequest to them.",
+        "The witnesses do not sign in the presence of the Testator and each other.",
+        "The witnesses are not of sound mind or are minors."
+      ],
+      "redFlagsInUserClause": [
+        "Lack of a formal attestation clause.",
+        "Witnesses' signatures are present, but the clause does not state that the signing was done in the Testator's presence.",
+        "The witness's identity is not clearly mentioned with their name and address."
+      ],
+      "suggestedWording": "For added legal protection, suggest that the clause include the full names, addresses, and signatures of the witnesses, confirming their roles.",
+      "source": "Indian Succession Act, 1925, Section 63."
+    },
+    {
+      "clauseType": "Payment of Debts and Taxes",
+      "idealText": "I direct my Executor to pay all my just debts, funeral and testamentary expenses, and all taxes and duties payable upon my death, from my estate as soon as reasonably possible after my death, and before the distribution of any bequests.",
+      "explanation": "This clause gives the Executor clear instructions to settle all outstanding liabilities of the Testator before distributing the assets to beneficiaries. This prevents the beneficiaries from being burdened with the Testator's debts. It clarifies the order of financial operations for the Executor.",
+      "commonRisks": [
+        "No provision is made for the payment of debts and taxes, leaving the Executor in a difficult position and potentially causing legal issues.",
+        "The clause is too vague about which assets should be used to pay off debts.",
+        "It unfairly burdens a specific beneficiary with all the debt payments."
+      ],
+      "redFlagsInUserClause": [
+        "No mention of how debts or taxes will be handled.",
+        "A clause that directs the Executor to pay debts but doesn't specify the source of the funds.",
+        "A clause that directs a specific beneficiary to pay off debts for the entire estate."
+      ],
+      "suggestedWording": "To provide more clarity, suggest adding: 'I authorize my Executor to sell any of my assets as may be necessary to meet such payments, should the available cash in my estate prove insufficient.'",
+      "source": "Indian Succession Act, 1925."
+    }
+  ],
+  "propertyAgreements": [
+    {
+      "clauseType": "POA_General_Grant_of_Authority",
+      "idealText": "I, [Principal's Full Name], hereby appoint [Agent's Full Name], to be my true and lawful Attorney-in-Fact to act for me and in my name and place, with full power and authority to do and perform all and every act, deed, and thing that I could lawfully do, including but not limited to managing my bank accounts, investments, and real estate, and conducting all my business and financial affairs.",
+      "explanation": "This is a general and broad grant of authority. It gives the agent comprehensive power to manage the principal's affairs. This type of POA is useful when the principal wants the agent to handle a wide range of responsibilities without specific limitations, such as during long-term travel or illness.",
+      "commonRisks": [
+        "The agent can misuse the broad power for personal gain.",
+        "The principal can lose control over their finances and assets without proper oversight.",
+        "A bank or third party may refuse to accept a very broadly worded POA without specific instructions for their particular transactions."
+      ],
+      "redFlagsInUserClause": [
+        "The authority granted is vague (e.g., 'to handle all my matters') without listing any specific actions.",
+        "The clause doesn't mention whether the POA is 'durable,' meaning it will not remain in effect if the principal becomes incapacitated.",
+        "There is no explicit provision for revoking the POA."
+      ],
+      "suggestedWording": "To make the clause more secure and legally robust, suggest adding: 'This Power of Attorney shall be a **Durable Power of Attorney**, and shall not be affected by my subsequent disability or incapacity.'",
+      "source": "Powers of Attorney Act, 1882 (India)."
+    },
+    {
+      "clauseType": "POA_Specific_Grant_of_Authority",
+      "idealText": "I, [Principal's Full Name], hereby appoint [Agent's Full Name], to be my true and lawful Attorney-in-Fact to act for me and in my name, with limited authority to **sell my property located at [Full Property Address]**. The Attorney-in-Fact's authority is limited to the execution of the sale deed, receiving the sale proceeds, and completing all formalities necessary for the transfer of the said property.",
+      "explanation": "This clause grants a specific and limited authority to the agent. It is often used for a single transaction, such as selling a property or managing a specific bank account. This provides greater control for the principal and minimizes the risk of the agent misusing their power.",
+      "commonRisks": [
+        "The agent's authority is not clearly defined, leading to confusion or an inability to complete the intended task.",
+        "The agent oversteps their limited authority and performs actions not specified in the document.",
+        "The POA expires before the specific task is completed."
+      ],
+      "redFlagsInUserClause": [
+        "The clause grants both general and specific authority, creating ambiguity.",
+        "The specific task is not detailed enough (e.g., 'to sell my house' without specifying the address or other details).",
+        "The clause does not state the termination of the agent's authority upon completion of the task."
+      ],
+      "suggestedWording": "To prevent misuse and ensure clarity, suggest adding: 'This Power of Attorney shall automatically terminate upon the completion of the sale of the said property.'",
+      "source": "Powers of Attorney Act, 1882 (India)."
+    },
+    {
+      "clauseType": "POA_Revocation",
+      "idealText": "This Power of Attorney is a **revocable** instrument and may be terminated or revoked by me at any time by executing a Revocation of Power of Attorney and providing written notice to my Attorney-in-Fact. This revocation shall be effective immediately upon the date of receipt of such notice.",
+      "explanation": "This clause explicitly states that the POA can be canceled by the principal at any time, as long as they are of sound mind. It also outlines the process for revocation, which provides a clear legal pathway to terminate the agent's authority.",
+      "commonRisks": [
+        "The principal becomes incapacitated and is unable to revoke the POA, even if the agent is acting against their interests.",
+        "No clear procedure for revocation is outlined, making it difficult to prove the POA has been terminated.",
+        "The agent continues to use the POA after it has been revoked because they were not formally notified."
+      ],
+      "redFlagsInUserClause": [
+        "No mention of the right to revoke the POA.",
+        "A clause that makes the POA 'irrevocable' without a valid reason, such as it being 'coupled with an interest'.",
+        "Lack of a requirement for written notice of revocation."
+      ],
+      "suggestedWording": "To add a legal safeguard, suggest: 'I hereby notify any third party or financial institution that they shall not be held liable for any action taken in good faith prior to their receipt of this revocation.'",
+      "source": "Powers of Attorney Act, 1882 (India)."
+    },
+    {
+      "clauseType": "POA_Indemnity_and_Liability",
+      "idealText": "The Attorney-in-Fact shall not be liable for any loss to my estate or for any act or omission by the Attorney-in-Fact unless such loss, act, or omission arises from the willful misconduct or gross negligence of the Attorney-in-Fact. I agree to indemnify and hold harmless the Attorney-in-Fact from all claims, costs, and expenses arising out of the good faith performance of their duties under this Power of Attorney.",
+      "explanation": "This clause is designed to protect the agent from liability for good-faith actions taken on the principal's behalf. It specifies that the agent will only be held responsible for losses resulting from their own willful misconduct or gross negligence, not for honest mistakes or poor outcomes.",
+      "commonRisks": [
+        "The agent is held personally liable for a bad investment or transaction that was not due to their negligence.",
+        "The clause is so broad that it allows the agent to act recklessly without any legal repercussions.",
+        "The clause does not clearly define what constitutes 'gross negligence' or 'willful misconduct'."
+      ],
+      "redFlagsInUserClause": [
+        "A clause that holds the agent harmless for any action, including fraud or theft.",
+        "No mention of the agent's 'fiduciary duty' to act in the best interest of the principal.",
+        "The clause is entirely missing, leaving the agent's liability unclear."
+      ],
+      "suggestedWording": "To balance protection and accountability, suggest adding: 'The Attorney-in-Fact shall act at all times with the utmost care and in my best interests, and shall maintain proper records and accounts of all transactions undertaken on my behalf.'",
+      "source": "Indian Contract Act, 1872 (as the relationship is one of agency)."
+    },
+    {
+      "clauseType": "POA_Duration_and_Effective_Date",
+      "idealText": "This Power of Attorney shall become effective on the date of its execution and shall remain in full force and effect until it is revoked by me in writing or until my death, whichever event occurs first. If this is a Durable Power of Attorney, it shall not be terminated by my subsequent disability or incapacity.",
+      "explanation": "This clause defines the lifespan of the POA. It specifies the start date and the conditions for termination, such as the principal's death or a formal revocation. For a **Durable POA**, this clause is vital as it clarifies that the agent's authority will continue even if the principal becomes mentally or physically incapacitated.",
+      "commonRisks": [
+        "The POA does not have a clear start date, leading to uncertainty about its validity.",
+        "The document is not a durable POA, and the agent's authority is automatically terminated if the principal becomes incapacitated.",
+        "The POA does not clearly state when it expires, allowing the agent to potentially act long after the principal's death."
+      ],
+      "redFlagsInUserClause": [
+        "No mention of the effective date or termination conditions.",
+        "The clause is missing the word 'durable' for a durable POA, which undermines its purpose.",
+        "It lacks a provision for the POA's termination upon the principal's death."
+      ],
+      "suggestedWording": "To provide more specific guidance, suggest adding: 'In the event of my death, this Power of Attorney shall immediately terminate and all authority granted herein shall cease.'",
+      "source": "Powers of Attorney Act, 1882 (India)."
+    },
+    {
+      "clauseType": "POA_Governing_Law_and_Jurisdiction",
+      "idealText": "This Power of Attorney shall be governed by and construed in accordance with the laws of India. Any dispute or difference arising out of or in connection with this instrument shall be subject to the exclusive jurisdiction of the competent courts in [City, State].",
+      "explanation": "This clause ensures that the POA is legally binding and enforceable. It specifies which country's or state's laws apply, which is particularly important for principals and agents who may live in different jurisdictions or who own property in another state. It also designates a specific court to handle any disputes, which helps avoid litigation in multiple locations.",
+      "commonRisks": [
+        "The POA is silent on the governing law, leading to confusion and legal challenges if the principal and agent live in different states or countries.",
+        "No specific jurisdiction is mentioned, which can force the parties to litigate in a distant or inconvenient court.",
+        "The POA is drafted in a way that conflicts with local laws, rendering it invalid."
+      ],
+      "redFlagsInUserClause": [
+        "The clause is entirely missing.",
+        "It names a jurisdiction where neither the principal nor the agent resides or where the assets are located.",
+        "The language is too broad, such as 'governed by common law,' which is not legally specific."
+      ],
+      "suggestedWording": "To ensure clarity and legal certainty, suggest specifying the exact location: 'The competent courts in [City, State] shall have exclusive jurisdiction over all matters concerning this Power of Attorney.'",
+      "source": "Indian Contract Act, 1872, and the Civil Procedure Code, 1908."
+    }
   ]
 }

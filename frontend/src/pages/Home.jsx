@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { analyzeDocumentApi } from '../services/api.js';
+import toast from 'react-hot-toast';
 
 const ModeSelector = ({ activeMode, setActiveMode }) => {
     const explanations = {
@@ -52,6 +53,8 @@ const HomePage = ({ activeMode, setActiveMode, setAnalysisResult, setIsLoading, 
             'application/pdf': ['.pdf'],
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
             'text/plain': ['.txt'],
+            'image/jpeg': ['.jpeg', '.jpg'],
+            'image/png': ['.png'],
         }
     });
     
@@ -67,7 +70,10 @@ const HomePage = ({ activeMode, setActiveMode, setAnalysisResult, setIsLoading, 
             setFileForDashboard({file: sourceFile, name: sourceName});
             setAnalysisResult(result);
         } catch (err) {
+            setAnalysisResult(null); 
+            setFileForDashboard(null);
             setError(err.toString());
+            toast.error('Analysis failed. The document might be encrypted or unreadable.');
         } finally {
             setIsLoading(false);
         }

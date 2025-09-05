@@ -12,12 +12,18 @@
   "dependencies": {
     "@google/genai": "^1.16.0",
     "@langchain/google-genai": "^0.2.16",
+    "canvas": "^3.2.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "fs": "^0.0.1-security",
     "langchain": "^0.3.31",
     "mammoth": "^1.10.0",
     "multer": "^2.0.2",
-    "pdf2json": "^3.2.0"
+    "pdf2json": "^3.2.0",
+    "pdf2pic": "^3.2.0",
+    "pdfjs-dist": "^5.4.149",
+    "sharp": "^0.34.3",
+    "tesseract.js": "^6.0.1"
   }
 }

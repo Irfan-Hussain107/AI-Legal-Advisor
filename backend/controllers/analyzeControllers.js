@@ -11,7 +11,7 @@ export const handleAnalysis = async (req, res) => {
             return res.status(400).json({ error: 'No document uploaded.' });
         }
 
-        const { mode, userPrompt } = req.body;
+        const { mode, userPrompt, documentType } = req.body;
         
         console.log('Starting document analysis...');
         const startTime = Date.now();
@@ -21,7 +21,7 @@ export const handleAnalysis = async (req, res) => {
         
         const vectorStorePromise = createDocumentIndex(documentText);
         
-        const analysisResult = await analyzeTransactionalDocument(documentText, userPrompt, mode);
+        const analysisResult = await analyzeTransactionalDocument(documentText, userPrompt, mode, documentType);
         console.log(`Analysis completed in ${Date.now() - startTime}ms`);
         
         documentVectorStore = await vectorStorePromise;
@@ -40,7 +40,7 @@ export const handleAnalysis = async (req, res) => {
         } else if (error.message?.includes('Unsupported file type')) {
             res.status(400).json({ error: 'Unsupported file type. Please upload PDF, DOCX, or TXT files.' });
         } else {
-            res.status(500).json({ error: 'An error occurred during analysis. Please try again.' });
+            res.status(500).json({ error: error.message || 'An error occurred during analysis. Please try again.' });
         }
     }
 };
@@ -77,7 +77,6 @@ export const handleChat = async (req, res) => {
     } catch (error) {
         console.error('Chat pipeline error:', error);
         
-        // Provide specific error messages
         if (error.message?.includes('quota')) {
             res.status(429).json({ error: 'API quota exceeded. Please try again later.' });
         } else if (error.message?.includes('network')) {
