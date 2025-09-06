@@ -1,142 +1,338 @@
+// textExtractor.js - handles file processing (NO PDF.js)
 import mammoth from 'mammoth';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { createWorker } from 'tesseract.js';
-import { createCanvas, Image } from 'canvas';
 import sharp from 'sharp';
+import fs from 'fs/promises';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
+import { fileTypeFromBuffer } from 'file-type';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Simple fix for the worker issue - just specify any valid string
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.js';
+const execFilePromise = promisify(execFile);
 
-// A helper factory that mocks the browser's canvas creation for pdf.js
-class NodeCanvasFactory {
-  create(width, height) {
-    const canvas = createCanvas(width, height);
-    const context = canvas.getContext("2d");
-    return {
-      canvas,
-      context,
-    };
-  }
+// --- SETUP ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  reset(canvasAndContext, width, height) {
-    canvasAndContext.canvas.width = width;
-    canvasAndContext.canvas.height = height;
-  }
-
-  destroy(canvasAndContext) {
-    canvasAndContext.canvas.width = 0;
-    canvasAndContext.canvas.height = 0;
-    canvasAndContext.canvas = null;
-    canvasAndContext.context = null;
-  }
-}
-
-// Heuristic to determine if a PDF is scanned based on its text content
-const isPdfScanned = (text) => {
-    return !text || text.trim().length < 150;
+// --- Utility: Sparse text detection ---
+const isTextSparse = (text) => {
+  if (!text) return true;
+  const trimmedText = text.trim();
+  const meaningfulChars = trimmedText.replace(/[\s\n\r\t\u00A0\u2000-\u200B\u2028-\u2029]/g, '').length;
+  return meaningfulChars < 50;
 };
 
-// Fixed rendering that avoids the Image constructor issue
-const renderPageToImage = async (page) => {
-    const viewport = page.getViewport({ scale: 2.0 });
-    const canvasFactory = new NodeCanvasFactory();
-    const { canvas, context } = canvasFactory.create(viewport.width, viewport.height);
-    
-    // Minimal render context - avoid all problematic options
-    const renderContext = {
-        canvasContext: context,
-        viewport,
-        canvasFactory
-    };
-    
-    try {
-        await page.render(renderContext).promise;
-        return canvas.toBuffer('image/png');
-    } catch (renderError) {
-        console.warn('Page rendering failed:', renderError.message);
-        // Create white canvas as fallback
-        context.fillStyle = 'white';
-        context.fillRect(0, 0, viewport.width, viewport.height);
-        context.fillStyle = 'black';
-        context.font = '20px Arial';
-        context.fillText('Rendering failed', 50, viewport.height / 2);
-        return canvas.toBuffer('image/png');
-    }
-};
+// --- Enhanced OCR with better preprocessing ---
+const performOcrOnImage = async (imageBuffer, pageNum, originalname = '') => {
+  if (!imageBuffer || imageBuffer.length === 0) {
+    console.warn(`[OCR] Empty image buffer for page ${pageNum}`);
+    return '';
+  }
 
-// Performs OCR on an image buffer, with image optimization
-const performOcrOnImage = async (imageBuffer) => {
-    const worker = await createWorker('eng');
-    const optimizedImage = await sharp(imageBuffer).greyscale().normalize().sharpen().toBuffer();
-    const { data: { text } } = await worker.recognize(optimizedImage);
-    await worker.terminate();
-    return text;
-};
+  console.log(`[OCR] Starting OCR for page ${pageNum}...`);
+  let worker = null;
 
-export const extractText = (file) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const { mimetype, buffer, originalname } = file;
-            console.log(`📄 Processing: ${originalname}`);
+  try {
+    // Enhanced image preprocessing for better OCR
+    const optimizedImageBuffer = await sharp(imageBuffer)
+      .resize({ 
+        width: 2480,
+        height: 3508, 
+        fit: 'inside',
+        withoutEnlargement: false 
+      })
+      .greyscale()
+      .normalize()
+      .sharpen({ sigma: 1.2 })
+      .modulate({ brightness: 1.1, contrast: 1.2 })
+      .png({ quality: 100, compressionLevel: 0 })
+      .toBuffer();
 
-            if (mimetype.startsWith('image/')) {
-                console.log('🖼️  Image file detected, starting OCR...');
-                const ocrText = await performOcrOnImage(buffer);
-                console.log('✅ OCR extraction from image complete.');
-                resolve(ocrText);
-                return;
-            }
-
-            if (mimetype === 'application/pdf') {
-                console.log('📑 PDF file detected. Checking for embedded text...');
-                
-                try {
-                    const loadingTask = pdfjsLib.getDocument(new Uint8Array(buffer));
-                    const pdf = await loadingTask.promise;
-                    const numPages = pdf.numPages;
-                    let embeddedText = '';
-
-                    for (let i = 1; i <= numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        embeddedText += textContent.items.map(item => item.str).join(' ');
-                    }
-
-                    if (!isPdfScanned(embeddedText)) {
-                        console.log('✅ Standard text extraction successful.');
-                        resolve(embeddedText);
-                    } else {
-                        console.log('📸 PDF appears to be scanned. Converting pages for OCR...');
-                        let ocrText = '';
-                        for (let i = 1; i <= numPages; i++) {
-                            const page = await pdf.getPage(i);
-                            const imageBuffer = await renderPageToImage(page);
-                            const pageOcrText = await performOcrOnImage(imageBuffer);
-                            ocrText += `--- Page ${i} ---\n${pageOcrText}\n\n`;
-                        }
-                        console.log('✅ PDF OCR extraction complete.');
-                        resolve(ocrText);
-                    }
-                } catch (pdfError) {
-                    console.error('PDF processing failed:', pdfError.message);
-                    resolve(`Error: Could not process PDF - ${pdfError.message}`);
-                }
-                return;
-            }
-
-            if (mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-                console.log('📝 DOCX file detected...');
-                const { value } = await mammoth.extractRawText({ buffer });
-                resolve(value);
-            } else if (mimetype === 'text/plain') {
-                console.log('📄 TXT file detected...');
-                resolve(buffer.toString('utf8'));
-            } else {
-                reject(new Error(`Unsupported file type: ${mimetype}`));
-            }
-        } catch (error) {
-            console.error('Text extraction failed:', error);
-            reject(error);
+    // Create Tesseract worker
+    worker = await createWorker('eng', 1, {
+      logger: (m) => {
+        if (m.status === 'recognizing text') {
+          console.log(`[OCR-Page-${pageNum}] Progress: ${(m.progress * 100).toFixed(1)}%`);
         }
+      },
     });
+
+    // Configure Tesseract for better accuracy
+    await worker.setParameters({
+      tessedit_pageseg_mode: '1',
+      preserve_interword_spaces: '1',
+      tessedit_char_whitelist: '',
+      tessedit_ocr_engine_mode: '1',
+    });
+
+    const { data: { text, confidence } } = await worker.recognize(optimizedImageBuffer);
+    
+    console.log(`[OCR] Page ${pageNum} completed. Text length: ${text.length}, Confidence: ${confidence.toFixed(2)}%`);
+    
+    return text || `[No text found on page ${pageNum}]`;
+    
+  } catch (error) {
+    console.error(`[OCR] Failed for page ${pageNum}: ${error.message}`);
+    return `[OCR Error on page ${pageNum}: ${error.message}]`;
+  } finally {
+    if (worker) {
+      try {
+        await worker.terminate();
+      } catch (e) {
+        console.warn(`[OCR] Worker cleanup failed: ${e.message}`);
+      }
+    }
+  }
+};
+
+// --- pdftotext extraction ---
+const extractTextWithPdftotext = async (buffer) => {
+  const tempPdfPath = `./temp_pdf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.pdf`;
+  let extractedText = '';
+  
+  try {
+    await fs.writeFile(tempPdfPath, buffer);
+    const { stdout } = await execFilePromise(
+      'pdftotext',
+      ['-raw', '-enc', 'UTF-8', '-eol', 'unix', tempPdfPath, '-'],
+      { maxBuffer: 50 * 1024 * 1024, timeout: 60000 }
+    );
+    extractedText = stdout;
+    console.log(`[pdftotext] Extraction successful. Length: ${extractedText.length} chars`);
+  } catch (error) {
+    console.warn(`[pdftotext] Failed: ${error.message}`);
+  } finally {
+    try {
+      await fs.unlink(tempPdfPath);
+    } catch (cleanupError) {
+      console.warn(`[pdftotext] Cleanup failed: ${cleanupError.message}`);
+    }
+  }
+  return extractedText;
+};
+
+// --- Convert PDF to images using pdftoppm ---
+const convertPdfToImages = async (buffer, originalname) => {
+  const tempPdfPath = `./temp_pdf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.pdf`;
+  const outputDir = `./temp_images_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  
+  try {
+    // Write PDF to temp file
+    await fs.writeFile(tempPdfPath, buffer);
+    
+    // Create output directory
+    await fs.mkdir(outputDir, { recursive: true });
+    
+    console.log(`[PDF to Images] Converting PDF to images using pdftoppm...`);
+    
+    // Use pdftoppm to convert PDF to PNG images
+    await execFilePromise(
+      'pdftoppm',
+      [
+        '-png',           // Output format
+        '-r', '200',      // Resolution (DPI)
+        tempPdfPath,      // Input PDF
+        path.join(outputDir, 'page') // Output prefix
+      ],
+      { maxBuffer: 100 * 1024 * 1024, timeout: 180000 }
+    );
+    
+    // Read the generated images
+    const files = await fs.readdir(outputDir);
+    const imageFiles = files
+      .filter(file => file.endsWith('.png'))
+      .sort((a, b) => {
+        const numA = parseInt(a.match(/\d+/)?.[0] || '0');
+        const numB = parseInt(b.match(/\d+/)?.[0] || '0');
+        return numA - numB;
+      });
+    
+    console.log(`[PDF to Images] Converted ${imageFiles.length} pages to images`);
+    
+    const imageBuffers = [];
+    for (const imageFile of imageFiles) {
+      const imagePath = path.join(outputDir, imageFile);
+      const imageBuffer = await fs.readFile(imagePath);
+      imageBuffers.push(imageBuffer);
+    }
+    
+    // Cleanup
+    await fs.rm(outputDir, { recursive: true, force: true });
+    await fs.unlink(tempPdfPath);
+    
+    return imageBuffers;
+    
+  } catch (error) {
+    // Cleanup on error
+    try {
+      await fs.rm(outputDir, { recursive: true, force: true });
+      await fs.unlink(tempPdfPath);
+    } catch (cleanupError) {
+      console.warn(`[PDF to Images] Cleanup failed: ${cleanupError.message}`);
+    }
+    
+    throw new Error(`PDF to images conversion failed: ${error.message}`);
+  }
+};
+
+// --- Alternative: Convert PDF to images using ImageMagick (if pdftoppm not available) ---
+const convertPdfToImagesImageMagick = async (buffer, originalname) => {
+  const tempPdfPath = `./temp_pdf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.pdf`;
+  const outputDir = `./temp_images_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  
+  try {
+    await fs.writeFile(tempPdfPath, buffer);
+    await fs.mkdir(outputDir, { recursive: true });
+    
+    console.log(`[PDF to Images] Converting PDF using ImageMagick...`);
+    
+    // Use ImageMagick convert command
+    await execFilePromise(
+      'convert',
+      [
+        '-density', '200',           // Resolution
+        '-quality', '100',           // Quality
+        tempPdfPath,                 // Input PDF
+        path.join(outputDir, 'page-%03d.png') // Output pattern
+      ],
+      { maxBuffer: 100 * 1024 * 1024, timeout: 180000 }
+    );
+    
+    const files = await fs.readdir(outputDir);
+    const imageFiles = files
+      .filter(file => file.endsWith('.png'))
+      .sort();
+    
+    console.log(`[PDF to Images] ImageMagick converted ${imageFiles.length} pages`);
+    
+    const imageBuffers = [];
+    for (const imageFile of imageFiles) {
+      const imagePath = path.join(outputDir, imageFile);
+      const imageBuffer = await fs.readFile(imagePath);
+      imageBuffers.push(imageBuffer);
+    }
+    
+    // Cleanup
+    await fs.rm(outputDir, { recursive: true, force: true });
+    await fs.unlink(tempPdfPath);
+    
+    return imageBuffers;
+    
+  } catch (error) {
+    try {
+      await fs.rm(outputDir, { recursive: true, force: true });
+      await fs.unlink(tempPdfPath);
+    } catch {}
+    
+    throw new Error(`ImageMagick PDF conversion failed: ${error.message}`);
+  }
+};
+
+// --- MAIN PDF PROCESSING ---
+const processPdfWithOcr = async (buffer, originalname) => {
+  console.log(`[PDF Processing] Starting PDF processing for: ${originalname}`);
+  
+  try {
+    // Try pdftotext first for speed
+    const pdftotextOutput = await extractTextWithPdftotext(buffer);
+    if (!isTextSparse(pdftotextOutput)) {
+      console.log(`[PDF Processing] pdftotext successful, using extracted text`);
+      return pdftotextOutput;
+    }
+
+    console.log(`[PDF Processing] pdftotext output sparse, falling back to OCR`);
+
+    let imageBuffers = [];
+    
+    // Try pdftoppm first, fallback to ImageMagick
+    try {
+      imageBuffers = await convertPdfToImages(buffer, originalname);
+    } catch (pdftoppmError) {
+      console.warn(`[PDF Processing] pdftoppm failed, trying ImageMagick: ${pdftoppmError.message}`);
+      try {
+        imageBuffers = await convertPdfToImagesImageMagick(buffer, originalname);
+      } catch (imageMagickError) {
+        throw new Error(`Both pdftoppm and ImageMagick failed. pdftoppm: ${pdftoppmError.message}, ImageMagick: ${imageMagickError.message}`);
+      }
+    }
+    
+    if (imageBuffers.length === 0) {
+      throw new Error('No images were generated from PDF');
+    }
+    
+    console.log(`[PDF Processing] Generated ${imageBuffers.length} images from PDF`);
+
+    let fullText = '';
+    
+    // Process images sequentially
+    for (let i = 0; i < imageBuffers.length; i++) {
+      const pageNum = i + 1;
+      console.log(`[PDF Processing] Processing page ${pageNum}/${imageBuffers.length}`);
+      
+      try {
+        const textContent = await performOcrOnImage(imageBuffers[i], pageNum, originalname);
+        fullText += `\n--- Page ${pageNum} ---\n${textContent}\n`;
+        
+        // Small delay between pages to prevent system overload
+        if (pageNum % 3 === 0) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+      } catch (pageError) {
+        console.error(`[PDF Processing] Failed to process page ${pageNum}: ${pageError.message}`);
+        fullText += `\n--- Page ${pageNum} ---\n[Error processing page: ${pageError.message}]\n`;
+      }
+    }
+
+    console.log(`[PDF Processing] Completed. Total text length: ${fullText.length}`);
+    return fullText;
+
+  } catch (error) {
+    console.error(`[PDF Processing] Fatal error: ${error.message}`);
+    throw new Error(`PDF processing failed: ${error.message}`);
+  }
+};
+
+// --- MAIN EXTRACTOR ---
+export const extractText = async (file) => {
+  try {
+    const { buffer, originalname, mimetype: fileMimetype } = file;
+    const fileType = await fileTypeFromBuffer(buffer);
+    const mimetype = fileType ? fileType.mime : fileMimetype;
+
+    console.log(`📄 Processing: ${originalname} (MIME: ${mimetype}, Size: ${buffer.length} bytes)`);
+
+    // Handle images with OCR
+    if (mimetype && mimetype.startsWith('image/')) {
+      console.log(`[Main] Processing image file`);
+      const ocrText = await performOcrOnImage(buffer, 1, originalname);
+      return ocrText;
+    }
+
+    // Handle PDFs with our enhanced processor
+    if (mimetype === 'application/pdf') {
+      console.log(`[Main] Processing PDF file`);
+      return await processPdfWithOcr(buffer, originalname);
+    }
+
+    // Handle Word documents
+    if (mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      console.log(`[Main] Processing Word document`);
+      const { value } = await mammoth.extractRawText({ buffer });
+      return value;
+    }
+
+    // Handle text files
+    if (mimetype === 'text/plain') {
+      console.log(`[Main] Processing text file`);
+      return buffer.toString('utf8');
+    }
+
+    throw new Error(`Unsupported file type: ${mimetype || 'unknown'}`);
+    
+  } catch (error) {
+    console.error(`[Text Extraction] Error processing file: ${error.message}`);
+    throw new Error(`Text extraction failed: ${error.message}`);
+  }
 };
