@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import { chatWithDocumentApi } from '../services/api.js';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
-
-console.log('PDF worker src set to:', pdfjs.GlobalWorkerOptions.workerSrc);
-
 
 const ModeSelector = ({ activeMode, setActiveMode }) => {
     return (
@@ -51,26 +48,33 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
     const [isBotReplying, setIsBotReplying] = useState(false);
     const [numPages, setNumPages] = useState(null);
     const [highlightedPage, setHighlightedPage] = useState({ page: null, risk: '' });
+    const [imageUrl, setImageUrl] = useState(null);
     const pdfContainerRef = useRef(null);
 
     useEffect(() => {
         if (analysisResult) {
             setChatMessages([{ type: 'bot', message: 'Hello! You can now ask me any questions about your document.' }]);
         }
-    }, [analysisResult]);
+
+        if (fileData?.file && fileData.file.type.startsWith('image/')) {
+            const url = URL.createObjectURL(fileData.file);
+            setImageUrl(url);
+            return () => URL.revokeObjectURL(url);
+        }
+        setImageUrl(null);
+
+    }, [analysisResult, fileData]);
     
+    // ... (Your other functions like handleClauseCardClick, handleSendMessage, etc. remain unchanged)
     const handleClauseCardClick = (pageNumber, risk) => {
         if (!pageNumber || !pdfContainerRef.current) return;
-        
         setHighlightedPage({ page: pageNumber, risk: risk.toLowerCase() });
         setTimeout(() => setHighlightedPage({ page: null, risk: '' }), 2500);
-
         const pageElement = pdfContainerRef.current.querySelector(`.react-pdf__Page[data-page-number="${pageNumber}"]`);
         if (pageElement) {
             pageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     };
-
     const handleSendMessage = async () => {
         if (chatInput.trim() && !isBotReplying) {
             const userMessage = { type: 'user', message: chatInput };
@@ -94,11 +98,9 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
             }
         }
     };
-    
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);
     }
-
     const renderSummary = () => {
         if (!analysisResult) return <p>Analysis data is not available. Please go to the Home page to analyze a document.</p>;
         const summaryText = activeMode === 'simple' ? analysisResult.summary.simple : analysisResult.summary.professional;
@@ -117,7 +119,6 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
             </div>
         );
     };
-
     const renderChatbot = () => (
         <div className="chat-layout">
             <div className="chat-container">
@@ -139,14 +140,12 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
             </div>
         </div>
     );
-    
     const renderComparison = () => (
          <div className="animated-content comparison-section">
             <h3 className="text-center">Feature Coming Soon</h3>
             <p className="text-center">The side-by-side document comparison feature is currently in development.</p>
         </div>
     );
-
     const renderTabContent = () => {
         switch (activeTab) {
             case 'chatbot': return renderChatbot();
@@ -165,7 +164,15 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
                         <h3 className="document-title">Original Document: {fileData?.name}</h3>
                         <div className="document-content-wrapper" ref={pdfContainerRef}>
                             <div className="document-content">
-                                {fileData?.file && (fileData.file.type === 'application/pdf' || fileData.name.endsWith('.pdf')) ? (
+                                { /* Logic to render images, PDFs, or text */ }
+                                {imageUrl ? (
+                                    <img 
+                                        src={imageUrl} 
+                                        alt={fileData.name} 
+                                        className="image-preview"
+                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                    />
+                                ) : fileData?.file && (fileData.file.type === 'application/pdf' || fileData.name.endsWith('.pdf')) ? (
                                     <Document file={fileData.file} onLoadSuccess={onDocumentLoadSuccess}>
                                         {Array.from(new Array(numPages || 0), (el, index) => (
                                             <Page

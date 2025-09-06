@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { analyzeDocumentApi } from '../services/api.js';
 import toast from 'react-hot-toast';
+import CameraModal from '../components/CameraModal.jsx';
 
 const ModeSelector = ({ activeMode, setActiveMode }) => {
     const explanations = {
@@ -39,6 +40,7 @@ const HomePage = ({ activeMode, setActiveMode, setAnalysisResult, setIsLoading, 
     const [file, setFile] = useState(null);
     const [userPrompt, setUserPrompt] = useState('');
     const [error, setError] = useState('');
+    const [isCameraOpen, setIsCameraOpen] = useState(false);
     const textAreaRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -61,6 +63,7 @@ const HomePage = ({ activeMode, setActiveMode, setAnalysisResult, setIsLoading, 
     const handleAnalysis = async (sourceFile, sourceName) => {
         if (!sourceFile) {
             setError('Please provide a document or text to analyze.');
+            toast.error('Please provide a document or text to analyze.');
             return;
         }
         setIsLoading(true);
@@ -90,42 +93,55 @@ const HomePage = ({ activeMode, setActiveMode, setAnalysisResult, setIsLoading, 
             handleAnalysis(textFile, "Pasted Text");
         } else {
             setError('Please paste some text to analyze.');
+            toast.error('Please paste some text to analyze.');
         }
     };
 
     return (
-        <section className="page animated-content">
-            <div className="container">
-                <div>
-                    <h1>Analyze Legal Documents with AI</h1>
-                    <p>Upload a document or paste text to identify risks, get summaries, and receive suggestions instantly.</p>
-                </div>
-                <div>
-                    <ModeSelector activeMode={activeMode} setActiveMode={setActiveMode} />
-                </div>
-                <div className="input-options">
-                    <div className="option-card animated-card interactive-hover">
-                        <h2>Upload Document</h2>
-                        <div {...getRootProps()} className={`upload-area ${isDragActive ? 'active' : ''}`}>
-                            <input {...getInputProps()} ref={fileInputRef} />
-                            <p>{file ? file.name : "Drag & drop your file here"}</p>
-                            <button className="button" type="button" onClick={() => fileInputRef.current.click()}>
-                                Browse Files
+        <>
+            {isCameraOpen && (
+                <CameraModal 
+                    onClose={() => setIsCameraOpen(false)}
+                    onCaptureComplete={(capturedFile) => handleAnalysis(capturedFile, capturedFile.name)}
+                />
+            )}
+            <section className="page animated-content">
+                <div className="container">
+                    <div>
+                        <h1>Analyze Legal Documents with AI</h1>
+                        <p>Upload a document or paste text to identify risks, get summaries, and receive suggestions instantly.</p>
+                    </div>
+                    
+                    <div>
+                        <ModeSelector activeMode={activeMode} setActiveMode={setActiveMode} />
+                    </div>
+
+                    <div className="input-options">
+                        <div className="option-card animated-card interactive-hover">
+                            <h2>Upload Document</h2>
+                            <div {...getRootProps()} className={`upload-area ${isDragActive ? 'active' : ''}`}>
+                                <input {...getInputProps()} ref={fileInputRef} />
+                                <p>{file ? file.name : "Drag & drop files here"}</p>
+                                <button className="button" type="button" onClick={() => fileInputRef.current.click()}>
+                                    Browse Files
+                                </button>
+                            </div>
+                            <button className="button" type="button" onClick={() => setIsCameraOpen(true)} style={{marginTop: '10px'}}>
+                                Capture with Camera
                             </button>
+                             <button className="button" style={{marginTop: '20px', width: '100%'}} onClick={handleFileSubmit} disabled={!file}>Analyze Uploaded File</button>
                         </div>
-                         <button className="button" style={{marginTop: '20px', width: '100%'}} onClick={handleFileSubmit} disabled={!file}>Analyze Uploaded File</button>
+                        <div className="option-card animated-card interactive-hover">
+                            <h2>Paste Text</h2>
+                            <textarea ref={textAreaRef} placeholder="Paste your legal text here..." />
+                            <button className="button" style={{width: '100%'}} onClick={handleTextSubmit}>Analyze Text</button>
+                        </div>
                     </div>
-                    <div className="option-card animated-card interactive-hover">
-                        <h2>Paste Text</h2>
-                        <textarea ref={textAreaRef} placeholder="Paste your legal text here..." />
-                        <button className="button" style={{width: '100%'}} onClick={handleTextSubmit}>Analyze Text</button>
-                    </div>
+                     {error && <p className="error-message" style={{color: 'red', marginTop: '20px'}}>{error}</p>}
                 </div>
-                 {error && <p className="error-message" style={{color: 'red', marginTop: '20px'}}>{error}</p>}
-            </div>
-        </section>
+            </section>
+        </>
     );
 };
 
 export default HomePage;
-
