@@ -1,4 +1,3 @@
-// textExtractor.js - handles file processing (NO PDF.js)
 import mammoth from 'mammoth';
 import { createWorker } from 'tesseract.js';
 import sharp from 'sharp';
@@ -11,11 +10,9 @@ import { fileURLToPath } from 'url';
 
 const execFilePromise = promisify(execFile);
 
-// --- SETUP ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- Utility: Sparse text detection ---
 const isTextSparse = (text) => {
   if (!text) return true;
   const trimmedText = text.trim();
@@ -23,7 +20,6 @@ const isTextSparse = (text) => {
   return meaningfulChars < 50;
 };
 
-// --- Enhanced OCR with better preprocessing ---
 const performOcrOnImage = async (imageBuffer, pageNum, originalname = '') => {
   if (!imageBuffer || imageBuffer.length === 0) {
     console.warn(`[OCR] Empty image buffer for page ${pageNum}`);
@@ -34,7 +30,6 @@ const performOcrOnImage = async (imageBuffer, pageNum, originalname = '') => {
   let worker = null;
 
   try {
-    // Enhanced image preprocessing for better OCR
     const optimizedImageBuffer = await sharp(imageBuffer)
       .resize({ 
         width: 2480,
@@ -49,7 +44,6 @@ const performOcrOnImage = async (imageBuffer, pageNum, originalname = '') => {
       .png({ quality: 100, compressionLevel: 0 })
       .toBuffer();
 
-    // Create Tesseract worker
     worker = await createWorker('eng', 1, {
       logger: (m) => {
         if (m.status === 'recognizing text') {
@@ -58,7 +52,6 @@ const performOcrOnImage = async (imageBuffer, pageNum, originalname = '') => {
       },
     });
 
-    // Configure Tesseract for better accuracy
     await worker.setParameters({
       tessedit_pageseg_mode: '1',
       preserve_interword_spaces: '1',
@@ -86,7 +79,6 @@ const performOcrOnImage = async (imageBuffer, pageNum, originalname = '') => {
   }
 };
 
-// --- pdftotext extraction ---
 const extractTextWithPdftotext = async (buffer) => {
   const tempPdfPath = `./temp_pdf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.pdf`;
   let extractedText = '';
@@ -112,33 +104,28 @@ const extractTextWithPdftotext = async (buffer) => {
   return extractedText;
 };
 
-// --- Convert PDF to images using pdftoppm ---
 const convertPdfToImages = async (buffer, originalname) => {
   const tempPdfPath = `./temp_pdf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.pdf`;
   const outputDir = `./temp_images_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   
   try {
-    // Write PDF to temp file
     await fs.writeFile(tempPdfPath, buffer);
     
-    // Create output directory
     await fs.mkdir(outputDir, { recursive: true });
     
     console.log(`[PDF to Images] Converting PDF to images using pdftoppm...`);
     
-    // Use pdftoppm to convert PDF to PNG images
     await execFilePromise(
       'pdftoppm',
       [
-        '-png',           // Output format
-        '-r', '200',      // Resolution (DPI)
-        tempPdfPath,      // Input PDF
-        path.join(outputDir, 'page') // Output prefix
+        '-png',           
+        '-r', '200',      
+        tempPdfPath,      
+        path.join(outputDir, 'page') 
       ],
       { maxBuffer: 100 * 1024 * 1024, timeout: 180000 }
     );
     
-    // Read the generated images
     const files = await fs.readdir(outputDir);
     const imageFiles = files
       .filter(file => file.endsWith('.png'))
@@ -157,14 +144,12 @@ const convertPdfToImages = async (buffer, originalname) => {
       imageBuffers.push(imageBuffer);
     }
     
-    // Cleanup
     await fs.rm(outputDir, { recursive: true, force: true });
     await fs.unlink(tempPdfPath);
     
     return imageBuffers;
     
   } catch (error) {
-    // Cleanup on error
     try {
       await fs.rm(outputDir, { recursive: true, force: true });
       await fs.unlink(tempPdfPath);
@@ -176,7 +161,6 @@ const convertPdfToImages = async (buffer, originalname) => {
   }
 };
 
-// --- Alternative: Convert PDF to images using ImageMagick (if pdftoppm not available) ---
 const convertPdfToImagesImageMagick = async (buffer, originalname) => {
   const tempPdfPath = `./temp_pdf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.pdf`;
   const outputDir = `./temp_images_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -187,14 +171,13 @@ const convertPdfToImagesImageMagick = async (buffer, originalname) => {
     
     console.log(`[PDF to Images] Converting PDF using ImageMagick...`);
     
-    // Use ImageMagick convert command
     await execFilePromise(
       'convert',
       [
-        '-density', '200',           // Resolution
-        '-quality', '100',           // Quality
-        tempPdfPath,                 // Input PDF
-        path.join(outputDir, 'page-%03d.png') // Output pattern
+        '-density', '200',           
+        '-quality', '100',           
+        tempPdfPath,                 
+        path.join(outputDir, 'page-%03d.png') 
       ],
       { maxBuffer: 100 * 1024 * 1024, timeout: 180000 }
     );
@@ -213,7 +196,6 @@ const convertPdfToImagesImageMagick = async (buffer, originalname) => {
       imageBuffers.push(imageBuffer);
     }
     
-    // Cleanup
     await fs.rm(outputDir, { recursive: true, force: true });
     await fs.unlink(tempPdfPath);
     
@@ -229,12 +211,10 @@ const convertPdfToImagesImageMagick = async (buffer, originalname) => {
   }
 };
 
-// --- MAIN PDF PROCESSING ---
 const processPdfWithOcr = async (buffer, originalname) => {
   console.log(`[PDF Processing] Starting PDF processing for: ${originalname}`);
   
   try {
-    // Try pdftotext first for speed
     const pdftotextOutput = await extractTextWithPdftotext(buffer);
     if (!isTextSparse(pdftotextOutput)) {
       console.log(`[PDF Processing] pdftotext successful, using extracted text`);
@@ -245,7 +225,6 @@ const processPdfWithOcr = async (buffer, originalname) => {
 
     let imageBuffers = [];
     
-    // Try pdftoppm first, fallback to ImageMagick
     try {
       imageBuffers = await convertPdfToImages(buffer, originalname);
     } catch (pdftoppmError) {
@@ -265,7 +244,6 @@ const processPdfWithOcr = async (buffer, originalname) => {
 
     let fullText = '';
     
-    // Process images sequentially
     for (let i = 0; i < imageBuffers.length; i++) {
       const pageNum = i + 1;
       console.log(`[PDF Processing] Processing page ${pageNum}/${imageBuffers.length}`);
@@ -274,7 +252,6 @@ const processPdfWithOcr = async (buffer, originalname) => {
         const textContent = await performOcrOnImage(imageBuffers[i], pageNum, originalname);
         fullText += `\n--- Page ${pageNum} ---\n${textContent}\n`;
         
-        // Small delay between pages to prevent system overload
         if (pageNum % 3 === 0) {
           await new Promise(resolve => setTimeout(resolve, 500));
         }
@@ -294,7 +271,6 @@ const processPdfWithOcr = async (buffer, originalname) => {
   }
 };
 
-// --- MAIN EXTRACTOR ---
 export const extractText = async (file) => {
   try {
     const { buffer, originalname, mimetype: fileMimetype } = file;
@@ -303,27 +279,23 @@ export const extractText = async (file) => {
 
     console.log(`📄 Processing: ${originalname} (MIME: ${mimetype}, Size: ${buffer.length} bytes)`);
 
-    // Handle images with OCR
     if (mimetype && mimetype.startsWith('image/')) {
       console.log(`[Main] Processing image file`);
       const ocrText = await performOcrOnImage(buffer, 1, originalname);
       return ocrText;
     }
 
-    // Handle PDFs with our enhanced processor
     if (mimetype === 'application/pdf') {
       console.log(`[Main] Processing PDF file`);
       return await processPdfWithOcr(buffer, originalname);
     }
 
-    // Handle Word documents
     if (mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       console.log(`[Main] Processing Word document`);
       const { value } = await mammoth.extractRawText({ buffer });
       return value;
     }
 
-    // Handle text files
     if (mimetype === 'text/plain') {
       console.log(`[Main] Processing text file`);
       return buffer.toString('utf8');

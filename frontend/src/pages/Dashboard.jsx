@@ -65,7 +65,6 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
 
     }, [analysisResult, fileData]);
     
-    // ... (Your other functions like handleClauseCardClick, handleSendMessage, etc. remain unchanged)
     const handleClauseCardClick = (pageNumber, risk) => {
         if (!pageNumber || !pdfContainerRef.current) return;
         setHighlightedPage({ page: pageNumber, risk: risk.toLowerCase() });

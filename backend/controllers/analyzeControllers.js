@@ -21,7 +21,6 @@ export const handleAnalysis = async (req, res) => {
         
         const vectorStorePromise = createDocumentIndex(documentText);
         
-        // Pass documentType here
         const analysisResult = await analyzeTransactionalDocument(documentText, userPrompt, mode, documentType);
         console.log(`Analysis completed in ${Date.now() - startTime}ms`);
         
@@ -34,12 +33,10 @@ export const handleAnalysis = async (req, res) => {
     } catch (error) {
         console.error('Analysis pipeline error:', error);
         
-        // Pass a more specific error message to the frontend
         res.status(500).json({ error: error.message || 'An error occurred during analysis.' });
     }
 };
 
-// ... (Your handleChat and getAnalysisStatus functions remain unchanged)
 export const handleChat = async (req, res) => {
     try {
         const { question, history } = req.body;

@@ -4,28 +4,24 @@ import { queryKnowledgeBase, addDocumentToStore, initializeDocumentStore } from 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Improved JSON cleaning function
 const cleanJsonResponse = (responseText) => {
     if (!responseText) {
         throw new Error('Empty response received');
     }
     
-    // Remove code blocks and extra whitespace
     let cleaned = responseText
         .replace(/```json\s*/gi, '')
         .replace(/```\s*/g, '')
         .replace(/^\s*[\r\n]+/gm, '')
         .trim();
     
-    // Handle common JSON issues
     cleaned = cleaned
-        .replace(/[\x00-\x1F\x7F-\x9F]/g, '') // Remove control characters
-        .replace(/\\/g, '\\\\') // Escape backslashes
-        .replace(/"/g, '\\"') // Escape quotes
-        .replace(/\\"/g, '"') // Fix over-escaping
-        .replace(/\\\\/g, '\\'); // Fix double escaping
+        .replace(/[\x00-\x1F\x7F-\x9F]/g, '') 
+        .replace(/\\/g, '\\\\') 
+        .replace(/"/g, '\\"') 
+        .replace(/\\"/g, '"') 
+        .replace(/\\\\/g, '\\'); 
     
-    // Try to extract JSON if it's wrapped in other text
     const jsonStart = cleaned.indexOf('{');
     const jsonEnd = cleaned.lastIndexOf('}');
     
@@ -36,7 +32,6 @@ const cleanJsonResponse = (responseText) => {
     return cleaned;
 };
 
-// Create a safe JSON structure as fallback
 const createSafeAnalysisResult = (documentText, errorMessage = '') => {
     return {
         summary: {
@@ -54,7 +49,6 @@ const createSafeAnalysisResult = (documentText, errorMessage = '') => {
     };
 };
 
-// Process document for analysis with enhanced error handling
 export async function processDocumentForAnalysis(documentText, filename) {
     try {
         console.log("Processing document for analysis...");
@@ -91,13 +85,11 @@ export async function processDocumentForAnalysis(documentText, filename) {
     }
 }
 
-// Enhanced analysis function with better error handling
 export async function analyzeTransactionalDocument(documentText, optionalUserPrompt, mode) {
     try {
         console.log("Starting document analysis...");
         console.log(`Document length: ${documentText.length} characters`);
         
-        // Validate input
         if (!documentText || typeof documentText !== 'string') {
             throw new Error('Invalid document text provided for analysis');
         }
@@ -107,24 +99,22 @@ export async function analyzeTransactionalDocument(documentText, optionalUserPro
             return createSafeAnalysisResult(documentText, "Document too short for analysis");
         }
         
-        // Process document and add to vector store
         try {
             await processDocumentForAnalysis(documentText, 'analysis_document');
         } catch (procError) {
             console.warn("Document processing failed, continuing with analysis:", procError.message);
         }
         
-        // Query knowledge base with error handling
         let contextFromKB = '';
         try {
             const relevantIdealClauses = await queryKnowledgeBase(
-                documentText.substring(0, 1000), // Use first 1000 chars for KB query
+                documentText.substring(0, 1000), 
                 3 // Reduce number of results
             );
             contextFromKB = relevantIdealClauses
                 .map(doc => doc.pageContent)
                 .join('\n---\n')
-                .substring(0, 2000); // Limit context size
+                .substring(0, 2000); 
         } catch (kbError) {
             console.warn('Knowledge base query failed:', kbError.message);
             contextFromKB = '';
@@ -138,8 +128,7 @@ export async function analyzeTransactionalDocument(documentText, optionalUserPro
             ? `User focus: "${optionalUserPrompt}". Address this specifically.`
             : "";
 
-        // Prepare analysis text with size limits
-        const maxAnalysisLength = 25000; // Reduced for better performance
+        const maxAnalysisLength = 25000; 
         let analysisText = documentText;
         
         if (documentText.length > maxAnalysisLength) {
@@ -182,7 +171,7 @@ ${analysisText}`;
                 console.log(`Calling Gemini API (${4 - retries}/3 attempts)...`);
                 
                 const model = genAI.getGenerativeModel({
-                    model: "gemini-1.5-flash", // Use stable model
+                    model: "gemini-1.5-flash", 
                     generationConfig: {
                         temperature: 0.1,
                         topP: 0.8,
@@ -204,7 +193,6 @@ ${analysisText}`;
                     const cleanedJson = cleanJsonResponse(responseText);
                     const parsedResult = JSON.parse(cleanedJson);
 
-                    // Validate and set defaults
                     if (!parsedResult.summary) {
                         parsedResult.summary = {
                             simple: "Document analysis completed",
@@ -220,7 +208,6 @@ ${analysisText}`;
                         parsedResult.clauses = [];
                     }
 
-                    // Validate clauses
                     parsedResult.clauses = parsedResult.clauses.filter(clause => 
                         clause && 
                         typeof clause === 'object' && 
@@ -234,7 +221,6 @@ ${analysisText}`;
                         suggestion: String(clause.suggestion || 'Review recommended').substring(0, 300)
                     }));
 
-                    // Always include original text
                     parsedResult.originalText = documentText;
 
                     console.log("Analysis completed successfully");
@@ -246,11 +232,9 @@ ${analysisText}`;
                     lastError = `JSON parsing failed: ${jsonError.message}`;
                     
                     if (retries === 1) {
-                        // Last attempt - try to extract any useful info
                         try {
                             const fallbackResult = createSafeAnalysisResult(documentText, lastError);
                             
-                            // Try to extract summary if visible in response
                             const summaryMatch = responseText.match(/"simple":\s*"([^"]+)"/);
                             if (summaryMatch) {
                                 fallbackResult.summary.simple = summaryMatch[1];
@@ -293,7 +277,6 @@ ${analysisText}`;
             }
         }
 
-        // Fallback return (should not reach here)
         return createSafeAnalysisResult(documentText, 'Analysis failed after all attempts');
 
     } catch (error) {

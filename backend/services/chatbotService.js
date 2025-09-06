@@ -106,9 +106,9 @@ Respond conversationally and helpfully. Only if you absolutely cannot find any r
              ? response.response.text()
              : response?.text) || '';
         
-        const sanitize = (s) => s.replace(/\*\*(.*?)\*\*/g, '$1')   // remove bold
-             .replace(/__(.*?)__/g, '$1')       // remove underline-like
-             .replace(/--+/g, '-')              // collapse long dashes
+        const sanitize = (s) => s.replace(/\*\*(.*?)\*\*/g, '$1')   
+             .replace(/__(.*?)__/g, '$1')       
+             .replace(/--+/g, '-')              
              .trim();
         
         const cleanText = sanitize(responseText);

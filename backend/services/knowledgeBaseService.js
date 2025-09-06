@@ -13,12 +13,10 @@ const embeddings = new GoogleGenerativeAIEmbeddings({
     model: "embedding-001" 
 });
 
-// Calculate text size in bytes for embedding API limits
 const getTextSizeInBytes = (text) => {
     return Buffer.byteLength(text, 'utf8');
 };
 
-// Enhanced text chunking with byte-size awareness
 export const chunkText = (text, maxChunkSize = 15000, overlap = 300) => {
     if (!text || typeof text !== 'string') {
         console.warn('Invalid text input for chunking');
@@ -26,9 +24,8 @@ export const chunkText = (text, maxChunkSize = 15000, overlap = 300) => {
     }
     
     if (text.length <= maxChunkSize) {
-        // Still check byte size even for "small" text
         const byteSize = getTextSizeInBytes(text);
-        if (byteSize <= 30000) { // 30KB safety margin
+        if (byteSize <= 30000) { 
             return [text];
         }
     }
@@ -41,7 +38,6 @@ export const chunkText = (text, maxChunkSize = 15000, overlap = 300) => {
     while (startIndex < text.length) {
         let endIndex = startIndex + maxChunkSize;
         
-        // Find natural break points
         if (endIndex < text.length) {
             const pageBreak = text.lastIndexOf('--- Page', endIndex);
             if (pageBreak > startIndex + maxChunkSize * 0.5) {
@@ -61,10 +57,8 @@ export const chunkText = (text, maxChunkSize = 15000, overlap = 300) => {
 
         let chunk = text.slice(startIndex, endIndex).trim();
         
-        // Ensure chunk is within byte limits
         let byteSize = getTextSizeInBytes(chunk);
         while (byteSize > 30000 && chunk.length > 1000) {
-            // Reduce chunk size if it's too large in bytes
             const reduceBy = Math.ceil(chunk.length * 0.1);
             chunk = chunk.slice(0, -reduceBy).trim();
             byteSize = getTextSizeInBytes(chunk);
@@ -87,7 +81,6 @@ export const chunkText = (text, maxChunkSize = 15000, overlap = 300) => {
     return chunks.length > 0 ? chunks : [''];
 };
 
-// Initialize the knowledge base
 export async function initializeKnowledgeBase() {
     if (knowledgeBaseStore) {
         console.log("Knowledge base already initialized.");
@@ -115,7 +108,6 @@ export async function initializeKnowledgeBase() {
     }
 }
 
-// Initialize document store
 export async function initializeDocumentStore() {
     if (!documentStore) {
         console.log("Initializing document store...");
@@ -125,7 +117,6 @@ export async function initializeDocumentStore() {
     return documentStore;
 }
 
-// Add document with improved error handling and size management
 export async function addDocumentToStore(documentText, metadata = {}) {
     try {
         if (!documentStore) {
@@ -139,7 +130,6 @@ export async function addDocumentToStore(documentText, metadata = {}) {
         const textSizeKB = getTextSizeInBytes(documentText) / 1024;
         console.log(`Document size: ${textSizeKB.toFixed(2)} KB`);
         
-        // Use smaller chunks (15KB) to stay well under the 36KB API limit
         if (textSizeKB > 15) {
             console.log("Large document detected, chunking...");
             
@@ -164,8 +154,7 @@ export async function addDocumentToStore(documentText, metadata = {}) {
             
             console.log(`Adding ${documents.length} chunks to vector store...`);
             
-            // Process in small batches with delays
-            const batchSize = 1; // Process one at a time to avoid rate limits
+            const batchSize = 1; 
             let processed = 0;
             let errors = 0;
             
@@ -174,7 +163,6 @@ export async function addDocumentToStore(documentText, metadata = {}) {
                     const doc = documents[i];
                     const docByteSize = getTextSizeInBytes(doc.pageContent);
                     
-                    // Final safety check
                     if (docByteSize > 30000) {
                         console.warn(`Skipping chunk ${i + 1}: too large (${(docByteSize/1024).toFixed(1)}KB)`);
                         errors++;
@@ -185,7 +173,6 @@ export async function addDocumentToStore(documentText, metadata = {}) {
                     processed++;
                     console.log(`   Processed ${processed}/${documents.length} chunks`);
                     
-                    // Delay between requests to avoid rate limiting
                     if (i < documents.length - 1) {
                         await new Promise(resolve => setTimeout(resolve, 300));
                     }
@@ -194,7 +181,6 @@ export async function addDocumentToStore(documentText, metadata = {}) {
                     console.error(`Failed chunk ${i + 1}:`, batchError.message);
                     errors++;
                     
-                    // If it's a size error, try with smaller chunk
                     if (batchError.message.includes('payload') || batchError.message.includes('bytes')) {
                         try {
                             const smallerChunk = documents[i].pageContent.substring(0, 10000);
@@ -216,7 +202,6 @@ export async function addDocumentToStore(documentText, metadata = {}) {
                         }
                     }
                     
-                    // Add delay after errors too
                     await new Promise(resolve => setTimeout(resolve, 500));
                 }
             }
@@ -231,7 +216,6 @@ export async function addDocumentToStore(documentText, metadata = {}) {
             };
             
         } else {
-            // Small document processing
             console.log("Processing as single document...");
             
             const docByteSize = getTextSizeInBytes(documentText);
@@ -264,7 +248,6 @@ export async function addDocumentToStore(documentText, metadata = {}) {
     } catch (error) {
         console.error('Failed to add document to store:', error);
         
-        // Better error handling for specific embedding API errors
         if (error.message.includes('payload') || error.message.includes('bytes') || error.message.includes('36000')) {
             console.log("Attempting recovery with micro-chunks...");
             try {
@@ -278,10 +261,9 @@ export async function addDocumentToStore(documentText, metadata = {}) {
     }
 }
 
-// Fallback for extremely large documents
 const addDocumentWithMicroChunks = async (documentText, metadata = {}) => {
     try {
-        const chunks = chunkText(documentText, 8000, 50); // Very small chunks
+        const chunks = chunkText(documentText, 8000, 50); 
         console.log(`Using micro-chunks: ${chunks.length} pieces`);
         
         let successCount = 0;
