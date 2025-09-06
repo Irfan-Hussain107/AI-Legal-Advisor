@@ -21,6 +21,7 @@ export const handleAnalysis = async (req, res) => {
         
         const vectorStorePromise = createDocumentIndex(documentText);
         
+        // Pass documentType here
         const analysisResult = await analyzeTransactionalDocument(documentText, userPrompt, mode, documentType);
         console.log(`Analysis completed in ${Date.now() - startTime}ms`);
         
@@ -33,18 +34,12 @@ export const handleAnalysis = async (req, res) => {
     } catch (error) {
         console.error('Analysis pipeline error:', error);
         
-        if (error.message?.includes('GEMINI_API_KEY')) {
-            res.status(500).json({ error: 'API configuration error. Please check server settings.' });
-        } else if (error.message?.includes('quota')) {
-            res.status(429).json({ error: 'API quota exceeded. Please try again later.' });
-        } else if (error.message?.includes('Unsupported file type')) {
-            res.status(400).json({ error: 'Unsupported file type. Please upload PDF, DOCX, or TXT files.' });
-        } else {
-            res.status(500).json({ error: error.message || 'An error occurred during analysis. Please try again.' });
-        }
+        // Pass a more specific error message to the frontend
+        res.status(500).json({ error: error.message || 'An error occurred during analysis.' });
     }
 };
 
+// ... (Your handleChat and getAnalysisStatus functions remain unchanged)
 export const handleChat = async (req, res) => {
     try {
         const { question, history } = req.body;
