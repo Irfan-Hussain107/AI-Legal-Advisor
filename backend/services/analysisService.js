@@ -8,27 +8,27 @@ const cleanJsonResponse = (responseText) => {
     if (!responseText) {
         throw new Error('Empty response received');
     }
-    
+   
     let cleaned = responseText
         .replace(/```json\s*/gi, '')
         .replace(/```\s*/g, '')
         .replace(/^\s*[\r\n]+/gm, '')
         .trim();
-    
+   
     cleaned = cleaned
-        .replace(/[\x00-\x1F\x7F-\x9F]/g, '') 
-        .replace(/\\/g, '\\\\') 
-        .replace(/"/g, '\\"') 
-        .replace(/\\"/g, '"') 
-        .replace(/\\\\/g, '\\'); 
-    
+        .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\\"/g, '"')
+        .replace(/\\\\/g, '\\');
+   
     const jsonStart = cleaned.indexOf('{');
     const jsonEnd = cleaned.lastIndexOf('}');
-    
+   
     if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
         cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
     }
-    
+   
     return cleaned;
 };
 
@@ -49,14 +49,38 @@ const createSafeAnalysisResult = (documentText, errorMessage = '') => {
     };
 };
 
+const extractTextFromPDF = async (pdfFile) => {
+    try {
+        const pdfjsLib = await import('pdfjs-dist');
+        const arrayBuffer = await pdfFile.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        
+        let fullText = '';
+        const pageTexts = [];
+        
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            pageTexts.push(pageText);
+            fullText += pageText + '\n';
+        }
+        
+        return { fullText, pageTexts };
+    } catch (error) {
+        console.error('PDF text extraction failed:', error);
+        return { fullText: '', pageTexts: [] };
+    }
+};
+
 export async function processDocumentForAnalysis(documentText, filename) {
     try {
         console.log("Processing document for analysis...");
-        
+       
         if (!documentText || typeof documentText !== 'string') {
             throw new Error('Invalid document text provided for processing');
         }
-        
+       
         if (documentText.trim().length === 0) {
             console.warn("Document appears to be empty");
             return {
@@ -67,54 +91,59 @@ export async function processDocumentForAnalysis(documentText, filename) {
                 originalSize: 0
             };
         }
-        
+       
         await initializeDocumentStore();
-        
+       
         const result = await addDocumentToStore(documentText, {
             source: filename || 'uploaded_document',
             uploadedAt: new Date().toISOString(),
             type: 'user_document'
         });
-        
+       
         console.log("Document processing result:", result);
         return result;
-        
+       
     } catch (error) {
         console.error("Document processing failed:", error);
         throw error;
     }
 }
 
-export async function analyzeTransactionalDocument(documentText, optionalUserPrompt, mode) {
+export async function analyzeTransactionalDocument(documentText, optionalUserPrompt, mode, fileData = null) {
     try {
         console.log("Starting document analysis...");
         console.log(`Document length: ${documentText.length} characters`);
-        
+       
         if (!documentText || typeof documentText !== 'string') {
             throw new Error('Invalid document text provided for analysis');
         }
-        
+       
         if (documentText.trim().length < 50) {
             console.warn("Document seems too short for meaningful analysis");
             return createSafeAnalysisResult(documentText, "Document too short for analysis");
         }
-        
+
+        let pdfTextData = null;
+        if (fileData?.file && (fileData.file.type === 'application/pdf' || fileData.name?.endsWith('.pdf'))) {
+            pdfTextData = await extractTextFromPDF(fileData.file);
+        }
+       
         try {
             await processDocumentForAnalysis(documentText, 'analysis_document');
         } catch (procError) {
             console.warn("Document processing failed, continuing with analysis:", procError.message);
         }
-        
+       
         let contextFromKB = '';
         try {
             const relevantIdealClauses = await queryKnowledgeBase(
-                documentText.substring(0, 1000), 
-                3 // Reduce number of results
+                documentText.substring(0, 1000),
+                3
             );
             contextFromKB = relevantIdealClauses
                 .map(doc => doc.pageContent)
                 .join('\n---\n')
-                .substring(0, 2000); 
+                .substring(0, 2000);
         } catch (kbError) {
             console.warn('Knowledge base query failed:', kbError.message);
             contextFromKB = '';
@@ -128,12 +157,12 @@ export async function analyzeTransactionalDocument(documentText, optionalUserPro
             ? `User focus: "${optionalUserPrompt}". Address this specifically.`
             : "";
 
-        const maxAnalysisLength = 25000; 
+        const maxAnalysisLength = 25000;
         let analysisText = documentText;
-        
+       
         if (documentText.length > maxAnalysisLength) {
             console.log(`Document truncated for analysis: ${documentText.length} -> ${maxAnalysisLength} chars`);
-            analysisText = documentText.substring(0, maxAnalysisLength) + 
+            analysisText = documentText.substring(0, maxAnalysisLength) +
                          "\n\n[Document truncated for analysis]";
         }
 
@@ -145,14 +174,14 @@ ${contextFromKB ? `Reference context: ${contextFromKB}` : ''}
 
 Required JSON structure:
 {
-  "summary": { 
-    "simple": "Brief summary in plain English", 
-    "professional": "Detailed professional summary" 
+  "summary": {
+    "simple": "Brief summary in plain English",
+    "professional": "Detailed professional summary"
   },
   "overallRisk": "Low|Medium|High",
   "clauses": [
     {
-      "clauseText": "Exact clause text from document",
+      "clauseText": "Exact clause text from document - copy the EXACT text as it appears",
       "risk": "Low|Medium|High",
       "explanation": "What this clause means",
       "suggestion": "Recommendation for improvement"
@@ -160,18 +189,20 @@ Required JSON structure:
   ]
 }
 
+IMPORTANT: For clauseText, copy the EXACT text as it appears in the document. Do not paraphrase, summarize, or modify the text. Copy it word for word, including punctuation and spacing.
+
 Document to analyze:
 ${analysisText}`;
 
         let retries = 3;
         let lastError = '';
-        
+       
         while (retries > 0) {
             try {
                 console.log(`Calling Gemini API (${4 - retries}/3 attempts)...`);
-                
+               
                 const model = genAI.getGenerativeModel({
-                    model: "gemini-1.5-flash", 
+                    model: "gemini-1.5-flash",
                     generationConfig: {
                         temperature: 0.1,
                         topP: 0.8,
@@ -188,7 +219,7 @@ ${analysisText}`;
                 }
 
                 console.log("Received response, parsing JSON...");
-                
+               
                 try {
                     const cleanedJson = cleanJsonResponse(responseText);
                     const parsedResult = JSON.parse(cleanedJson);
@@ -199,29 +230,33 @@ ${analysisText}`;
                             professional: "Legal document analysis performed"
                         };
                     }
-                    
+                   
                     if (!parsedResult.overallRisk || !['Low', 'Medium', 'High'].includes(parsedResult.overallRisk)) {
                         parsedResult.overallRisk = 'Medium';
                     }
-                    
+                   
                     if (!parsedResult.clauses || !Array.isArray(parsedResult.clauses)) {
                         parsedResult.clauses = [];
                     }
 
-                    parsedResult.clauses = parsedResult.clauses.filter(clause => 
-                        clause && 
-                        typeof clause === 'object' && 
-                        clause.clauseText && 
-                        clause.risk && 
+                    parsedResult.clauses = parsedResult.clauses.filter(clause =>
+                        clause &&
+                        typeof clause === 'object' &&
+                        clause.clauseText &&
+                        clause.risk &&
                         clause.explanation
                     ).map(clause => ({
-                        clauseText: String(clause.clauseText).substring(0, 500),
+                        clauseText: String(clause.clauseText).trim().substring(0, 800), // CHANGE: Increased length and trim text
                         risk: ['Low', 'Medium', 'High'].includes(clause.risk) ? clause.risk : 'Medium',
                         explanation: String(clause.explanation || 'Analysis provided').substring(0, 300),
                         suggestion: String(clause.suggestion || 'Review recommended').substring(0, 300)
                     }));
 
                     parsedResult.originalText = documentText;
+                    
+                    if (pdfTextData) {
+                        parsedResult.pdfTextData = pdfTextData;
+                    }
 
                     console.log("Analysis completed successfully");
                     return parsedResult;
@@ -230,16 +265,16 @@ ${analysisText}`;
                     console.error("JSON Parse Error:", jsonError.message);
                     console.error("Response preview:", responseText.substring(0, 200));
                     lastError = `JSON parsing failed: ${jsonError.message}`;
-                    
+                   
                     if (retries === 1) {
                         try {
                             const fallbackResult = createSafeAnalysisResult(documentText, lastError);
-                            
+                           
                             const summaryMatch = responseText.match(/"simple":\s*"([^"]+)"/);
                             if (summaryMatch) {
                                 fallbackResult.summary.simple = summaryMatch[1];
                             }
-                            
+                           
                             return fallbackResult;
                         } catch (fallbackError) {
                             console.error("Fallback extraction failed:", fallbackError);
@@ -250,7 +285,7 @@ ${analysisText}`;
             } catch (error) {
                 console.error(`Analysis attempt ${4 - retries} failed:`, error.message);
                 lastError = error.message;
-                
+               
                 if (error.message.includes('SAFETY') || error.message.includes('blocked')) {
                     console.log("Content safety issue, trying with sanitized text...");
                     analysisText = analysisText
@@ -265,9 +300,9 @@ ${analysisText}`;
                     analysisText = analysisText.substring(0, analysisText.length * 0.7);
                     console.log(`Reducing text size to ${analysisText.length} characters`);
                 }
-                
+               
                 retries--;
-                
+               
                 if (retries > 0) {
                     await delay(1000);
                 } else {

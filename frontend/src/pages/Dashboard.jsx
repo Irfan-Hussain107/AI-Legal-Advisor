@@ -24,10 +24,10 @@ const ModeSelector = ({ activeMode, setActiveMode }) => {
     );
 };
 
-const ClauseCard = ({ clause, onCardClick }) => {
+const ClauseCard = ({ clause, onCardClick, index }) => {
     const riskColorClass = `risk-text-${clause.risk.toLowerCase()}`;
     return (
-        <div className="risk-card animated-card-item interactive-hover" onClick={() => onCardClick(clause.pageNumber, clause.risk)}>
+        <div className="risk-card animated-card-item interactive-hover" onClick={() => onCardClick(clause, index)}>
             <div className="clause-content">
                 <h4>Original Text (Risk: <span className={riskColorClass}>{clause.risk}</span>)</h4>
                 <p className="original-text"><em>"{clause.clauseText}"</em></p>
@@ -40,7 +40,6 @@ const ClauseCard = ({ clause, onCardClick }) => {
     );
 };
 
-
 const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) => {
     const [activeTab, setActiveTab] = useState('summary');
     const [chatMessages, setChatMessages] = useState([]);
@@ -49,6 +48,8 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
     const [numPages, setNumPages] = useState(null);
     const [highlightedPage, setHighlightedPage] = useState({ page: null, risk: '' });
     const [imageUrl, setImageUrl] = useState(null);
+    const [highlightedClause, setHighlightedClause] = useState(null);
+    const [processedTextContent, setProcessedTextContent] = useState('');
     const pdfContainerRef = useRef(null);
 
     useEffect(() => {
@@ -64,16 +65,97 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
         setImageUrl(null);
 
     }, [analysisResult, fileData]);
-    
-    const handleClauseCardClick = (pageNumber, risk) => {
-        if (!pageNumber || !pdfContainerRef.current) return;
-        setHighlightedPage({ page: pageNumber, risk: risk.toLowerCase() });
-        setTimeout(() => setHighlightedPage({ page: null, risk: '' }), 2500);
-        const pageElement = pdfContainerRef.current.querySelector(`.react-pdf__Page[data-page-number="${pageNumber}"]`);
-        if (pageElement) {
-            pageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    useEffect(() => {
+        if (analysisResult?.originalText) {
+            setProcessedTextContent(analysisResult.originalText);
+        }
+    }, [analysisResult]);
+
+    const highlightClauseInText = (clauseText, risk, clauseIdx) => {
+        const textContainer = document.querySelector('.text-preview-container pre');
+        if (!textContainer) return;
+
+        const existingHighlights = textContainer.querySelectorAll('.clause-highlight');
+        existingHighlights.forEach(highlight => {
+            const parent = highlight.parentNode;
+            parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+            parent.normalize();
+        });
+
+        const textContent = textContainer.textContent;
+        const foundIndex = textContent.indexOf(clauseText);
+        
+        if (foundIndex !== -1) {
+            const beforeText = textContent.substring(0, foundIndex);
+            const afterText = textContent.substring(foundIndex + clauseText.length);
+            
+            const highlightSpan = document.createElement('span');
+            highlightSpan.className = `clause-highlight clause-highlight-${risk.toLowerCase()}`;
+            highlightSpan.textContent = clauseText;
+            highlightSpan.id = `clause-${clauseIdx}`;
+            
+            textContainer.innerHTML = '';
+            textContainer.appendChild(document.createTextNode(beforeText));
+            textContainer.appendChild(highlightSpan);
+            textContainer.appendChild(document.createTextNode(afterText));
+            
+            highlightSpan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            setHighlightedClause(clauseIdx);
+            
+            setTimeout(() => {
+                if (highlightSpan.parentNode) {
+                    const parent = highlightSpan.parentNode;
+                    parent.replaceChild(document.createTextNode(highlightSpan.textContent), highlightSpan);
+                    parent.normalize();
+                }
+                setHighlightedClause(null);
+            }, 3000);
         }
     };
+
+    const highlightClauseInPDF = (clauseText, risk, clauseIdx) => {
+        if (!analysisResult?.pdfTextData?.pageTexts) return;
+
+        let targetPage = -1;
+        for (let i = 0; i < analysisResult.pdfTextData.pageTexts.length; i++) {
+            if (analysisResult.pdfTextData.pageTexts[i].includes(clauseText)) {
+                targetPage = i + 1;
+                break;
+            }
+        }
+
+        if (targetPage > 0) {
+            const pageElement = pdfContainerRef.current?.querySelector(`.react-pdf__Page[data-page-number="${targetPage}"]`);
+            if (pageElement) {
+                pageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                pageElement.style.outline = `3px solid var(--risk-${risk.toLowerCase()}-color, #ff9800)`;
+                pageElement.style.outlineOffset = '5px';
+                
+                setHighlightedPage({ page: targetPage, risk: risk.toLowerCase() });
+                
+                setTimeout(() => {
+                    pageElement.style.outline = 'none';
+                    pageElement.style.outlineOffset = '0';
+                    setHighlightedPage({ page: null, risk: '' });
+                }, 3000);
+            }
+        }
+    };
+   
+    const handleClauseCardClick = (clause, clauseIdx) => {
+        const isPDF = fileData?.file && (fileData.file.type === 'application/pdf' || fileData.name?.endsWith('.pdf'));
+        const isTextDocument = !isPDF && !imageUrl;
+
+        if (isTextDocument) {
+            highlightClauseInText(clause.clauseText, clause.risk, clauseIdx);
+        } else if (isPDF) {
+            highlightClauseInPDF(clause.clauseText, clause.risk, clauseIdx);
+        }
+    };
+
     const handleSendMessage = async () => {
         if (chatInput.trim() && !isBotReplying) {
             const userMessage = { type: 'user', message: chatInput };
@@ -97,9 +179,11 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
             }
         }
     };
+
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);
     }
+
     const renderSummary = () => {
         if (!analysisResult) return <p>Analysis data is not available. Please go to the Home page to analyze a document.</p>;
         const summaryText = activeMode === 'simple' ? analysisResult.summary.simple : analysisResult.summary.professional;
@@ -113,11 +197,12 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
                 </div>
                 <h3 style={{marginTop: '30px', borderTop: '1px solid var(--border-color)', paddingTop: '20px'}}>Key Clauses Analysis</h3>
                 {analysisResult.clauses.map((clause, index) => (
-                    <ClauseCard key={index} clause={clause} onCardClick={handleClauseCardClick} />
+                    <ClauseCard key={index} clause={clause} onCardClick={handleClauseCardClick} index={index} />
                 ))}
             </div>
         );
     };
+
     const renderChatbot = () => (
         <div className="chat-layout">
             <div className="chat-container">
@@ -139,12 +224,14 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
             </div>
         </div>
     );
+
     const renderComparison = () => (
          <div className="animated-content comparison-section">
             <h3 className="text-center">Feature Coming Soon</h3>
             <p className="text-center">The side-by-side document comparison feature is currently in development.</p>
         </div>
     );
+
     const renderTabContent = () => {
         switch (activeTab) {
             case 'chatbot': return renderChatbot();
@@ -157,17 +244,87 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
     return (
         <section className="page animated-content">
             <div className="container p-0">
+                <style jsx>{`
+                    .clause-highlight {
+                        padding: 2px 4px;
+                        border-radius: 3px;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        position: relative;
+                    }
+                    .clause-highlight-low {
+                        background-color: rgba(76, 175, 80, 0.3);
+                        border: 2px solid #4CAF50;
+                    }
+                    .clause-highlight-medium {
+                        background-color: rgba(255, 152, 0, 0.3);
+                        border: 2px solid #FF9800;
+                    }
+                    .clause-highlight-high {
+                        background-color: rgba(244, 67, 54, 0.3);
+                        border: 2px solid #F44336;
+                    }
+                    .permanent-highlight {
+                        cursor: pointer !important;
+                    }
+                    .permanent-highlight:hover {
+                        opacity: 0.8;
+                        transform: scale(1.05);
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                        z-index: 10;
+                    }
+                    .clause-card-clickable {
+                        cursor: pointer;
+                        transition: transform 0.2s ease;
+                    }
+                    .clause-card-clickable:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                    }
+                    .react-pdf__Page {
+                        transition: outline 0.3s ease;
+                    }
+                    @keyframes clause-flash {
+                        0% { background-color: rgba(255, 255, 0, 0.6); }
+                        50% { background-color: rgba(255, 255, 0, 0.8); }
+                        100% { background-color: transparent; }
+                    }
+                    @keyframes page-flash {
+                        0% { outline-width: 4px; }
+                        50% { outline-width: 8px; }
+                        100% { outline-width: 4px; }
+                    }
+                    .pdf-clause-indicator {
+                        transition: all 0.3s ease;
+                        box-sizing: border-box;
+                    }
+                    .pdf-clause-indicator-low {
+                        border-color: #4CAF50 !important;
+                    }
+                    .pdf-clause-indicator-medium {
+                        border-color: #FF9800 !important;
+                    }
+                    .pdf-clause-indicator-high {
+                        border-color: #F44336 !important;
+                    }
+                    .pdf-highlight-overlay {
+                        pointer-events: none;
+                    }
+                    .pdf-highlight-overlay > div {
+                        pointer-events: auto;
+                    }
+                `}</style>
+                
                 <ModeSelector activeMode={activeMode} setActiveMode={setActiveMode} />
                 <div className="dashboard-layout">
                     <div className="panel left-panel">
                         <h3 className="document-title">Original Document: {fileData?.name}</h3>
                         <div className="document-content-wrapper" ref={pdfContainerRef}>
                             <div className="document-content">
-                                { /* Logic to render images, PDFs, or text */ }
                                 {imageUrl ? (
-                                    <img 
-                                        src={imageUrl} 
-                                        alt={fileData.name} 
+                                    <img
+                                        src={imageUrl}
+                                        alt={fileData.name}
                                         className="image-preview"
                                         style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                     />
@@ -183,7 +340,7 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
                                     </Document>
                                 ) : analysisResult?.originalText ? (
                                     <div className="text-preview-container">
-                                        <pre>{analysisResult.originalText}</pre>
+                                        <pre>{processedTextContent}</pre>
                                     </div>
                                 ) : (
                                     <div className="text-center"><p>No document preview available.</p></div>
