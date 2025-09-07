@@ -57,7 +57,7 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
             setChatMessages([{ type: 'bot', message: 'Hello! You can now ask me any questions about your document.' }]);
         }
 
-        if (fileData?.file && fileData.file.type.startsWith('image/')) {
+        if (fileData?.file?.type?.startsWith('image/')) {
             const url = URL.createObjectURL(fileData.file);
             setImageUrl(url);
             return () => URL.revokeObjectURL(url);
@@ -244,76 +244,6 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
     return (
         <section className="page animated-content">
             <div className="container p-0">
-                <style jsx>{`
-                    .clause-highlight {
-                        padding: 2px 4px;
-                        border-radius: 3px;
-                        font-weight: bold;
-                        transition: all 0.3s ease;
-                        position: relative;
-                    }
-                    .clause-highlight-low {
-                        background-color: rgba(76, 175, 80, 0.3);
-                        border: 2px solid #4CAF50;
-                    }
-                    .clause-highlight-medium {
-                        background-color: rgba(255, 152, 0, 0.3);
-                        border: 2px solid #FF9800;
-                    }
-                    .clause-highlight-high {
-                        background-color: rgba(244, 67, 54, 0.3);
-                        border: 2px solid #F44336;
-                    }
-                    .permanent-highlight {
-                        cursor: pointer !important;
-                    }
-                    .permanent-highlight:hover {
-                        opacity: 0.8;
-                        transform: scale(1.05);
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                        z-index: 10;
-                    }
-                    .clause-card-clickable {
-                        cursor: pointer;
-                        transition: transform 0.2s ease;
-                    }
-                    .clause-card-clickable:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-                    }
-                    .react-pdf__Page {
-                        transition: outline 0.3s ease;
-                    }
-                    @keyframes clause-flash {
-                        0% { background-color: rgba(255, 255, 0, 0.6); }
-                        50% { background-color: rgba(255, 255, 0, 0.8); }
-                        100% { background-color: transparent; }
-                    }
-                    @keyframes page-flash {
-                        0% { outline-width: 4px; }
-                        50% { outline-width: 8px; }
-                        100% { outline-width: 4px; }
-                    }
-                    .pdf-clause-indicator {
-                        transition: all 0.3s ease;
-                        box-sizing: border-box;
-                    }
-                    .pdf-clause-indicator-low {
-                        border-color: #4CAF50 !important;
-                    }
-                    .pdf-clause-indicator-medium {
-                        border-color: #FF9800 !important;
-                    }
-                    .pdf-clause-indicator-high {
-                        border-color: #F44336 !important;
-                    }
-                    .pdf-highlight-overlay {
-                        pointer-events: none;
-                    }
-                    .pdf-highlight-overlay > div {
-                        pointer-events: auto;
-                    }
-                `}</style>
                 
                 <ModeSelector activeMode={activeMode} setActiveMode={setActiveMode} />
                 <div className="dashboard-layout">
