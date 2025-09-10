@@ -126,7 +126,7 @@ const HomePage = ({ activeMode, setActiveMode, setAnalysisResult, setIsLoading, 
                                     Browse Files
                                 </button>
                             </div>
-                            <button className="button" type="button" onClick={() => setIsCameraOpen(true)} style={{marginTop: '10px'}}>
+                            <button className="button" type="button" onClick={() => setIsCameraOpen(true)} style={{marginTop: '20px'}}>
                                 Capture with Camera
                             </button>
                              <button className="button" style={{marginTop: '20px', width: '100%'}} onClick={handleFileSubmit} disabled={!file}>Analyze Uploaded File</button>
