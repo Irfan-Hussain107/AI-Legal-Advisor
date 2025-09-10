@@ -133,8 +133,8 @@ const HomePage = ({ activeMode, setActiveMode, setAnalysisResult, setIsLoading, 
                         </div>
                         <div className="option-card animated-card interactive-hover">
                             <h2>Paste Text</h2>
-                            <textarea ref={textAreaRef} placeholder="Paste your legal text here..." />
-                            <button className="button" style={{width: '100%'}} onClick={handleTextSubmit}>Analyze Text</button>
+                            <textarea ref={textAreaRef} placeholder="Paste your legal text here..." className='text-area' style={{outline: 'none', boxShadow: 'none'}} />
+                            <button className="button" style={{width: '100%', marginTop: '60px'}} onClick={handleTextSubmit}>Analyze Text</button>
                         </div>
                     </div>
                      {error && <p className="error-message" style={{color: 'red', marginTop: '20px'}}>{error}</p>}

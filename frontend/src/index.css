@@ -1318,3 +1318,16 @@ textarea:focus {
 .upload-area{
   min-height: 250px;
 }
+
+.text-area:hover{
+  border-color: #333;
+}
+
+.text-area{
+  outline: none;
+  border-style: dashed;
+  border-width: 2px;
+  height: 250px;
+  margin-top: 0px;
+  background-color: #fafafa;
+}
