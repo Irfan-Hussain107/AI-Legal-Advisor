@@ -86,3 +86,7 @@ export const getAnalysisStatus = async (req, res) => {
         documentTitle: currentAnalysisResult?.documentType || null
     });
 };
+
+export const handleStatusCheck = (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+};
