@@ -9,8 +9,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
-COPY package*.json ./
+RUN sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
 
+COPY package*.json ./
 RUN npm install --production
 
 COPY . .
