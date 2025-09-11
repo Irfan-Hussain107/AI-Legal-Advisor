@@ -1382,3 +1382,26 @@ textarea:focus {
   display: flex;
   gap: 10px;
 }
+
+.mic-button,
+.send-button {
+  background: #000;       /* black background */
+  border: none;
+  padding: 10px;
+  border-radius: 50%;     /* circle */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mic-button svg,
+.send-button svg {
+  stroke: #fff;           /* white icon */
+}
+
+.mic-button:hover,
+.send-button:hover {
+  background: #333;       /* dark gray on hover */
+}
+
