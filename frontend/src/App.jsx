@@ -18,24 +18,32 @@ const Header = ({ activePage, setActivePage }) => {
         <header>
             <nav>
                 <div className="logo">LegalAlly AI</div>
-                <ul>
-                    {navItems.map(item => (
-                        <li key={item}>
-                            <a
-                                href={`#${item.toLowerCase()}`}
-                                className={activePage === item.toLowerCase() ? 'active' : ''}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    if(item.toLowerCase() === 'dashboard' && !sessionStorage.getItem('analysisResult')) {
-                                        alert("Please analyze a document first to view the dashboard.");
-                                        return;
-                                    }
-                                    setActivePage(item.toLowerCase());
-                                }}
-                            >{item}</a>
-                        </li>
-                    ))}
-                </ul>
+                
+                {/* Group nav items and auth buttons together */}
+                <div className="nav-right">
+                    <ul>
+                        {navItems.map(item => (
+                            <li key={item}>
+                                <a
+                                    href={`#${item.toLowerCase()}`}
+                                    className={activePage === item.toLowerCase() ? 'active' : ''}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if(item.toLowerCase() === 'dashboard' && !sessionStorage.getItem('analysisResult')) {
+                                            alert("Please analyze a document first to view the dashboard.");
+                                            return;
+                                        }
+                                        setActivePage(item.toLowerCase());
+                                    }}
+                                >{item}</a>
+                            </li>
+                        ))}
+                    </ul>
+                    
+                    <div className="auth-buttons">
+                        <a href="#signin" className="auth-link signin">Sign In/Register</a>
+                    </div>
+                </div>
             </nav>
         </header>
     );
