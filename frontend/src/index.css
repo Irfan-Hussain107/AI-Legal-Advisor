@@ -1351,3 +1351,8 @@ textarea:focus {
   box-shadow: none;        
 }
 
+.dashboard-layout{
+  display: flex;
+  height: 90vh; /* or max-height: 90vh */
+}
+
