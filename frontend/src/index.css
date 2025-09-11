@@ -1417,6 +1417,9 @@ textarea:focus {
 
 .mode-selector {
   margin: 0;          /* remove extra spacing */
-  gap: 6px;           /* tighten button spacing if needed */
+  gap: 0px;           /* tighten button spacing if needed */
 }
 
+.panel {
+  margin: 0;      /* remove outer spacing */
+}
