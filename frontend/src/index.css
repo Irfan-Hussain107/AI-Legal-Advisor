@@ -1405,3 +1405,18 @@ textarea:focus {
   background: #333;       /* dark gray on hover */
 }
 
+.settings-card {
+  margin-top: 8px;    /* reduce from whatever it is now */
+  padding: 30px;      /* shrink if padding is large */
+}
+
+.settings-card h3 {
+  margin-top: 0;
+  margin-bottom: 6px; /* reduce gap between title and buttons */
+}
+
+.mode-selector {
+  margin: 0;          /* remove extra spacing */
+  gap: 6px;           /* tighten button spacing if needed */
+}
+
