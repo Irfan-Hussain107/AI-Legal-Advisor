@@ -1332,3 +1332,22 @@ textarea:focus {
   background-color: #fafafa;
   cursor: text;
 }
+
+.tabs {
+  position: sticky;
+  top: 0;               /* Stick to the top of its parent container */
+  background: var(--background-color, #fff); /* Give background so it doesn’t overlap */
+  z-index: 10;          /* Keep it above other elements */
+  padding-bottom: 10px;      /* Some breathing room */
+  border-bottom: 2px solid var(--border-color, #ddd); /* Optional */
+}
+
+.tab-link.active {
+  padding-bottom: 2px; /* reduce space between text and underline */
+}
+
+.tab-link:focus {
+  outline: none;          
+  box-shadow: none;        
+}
+
