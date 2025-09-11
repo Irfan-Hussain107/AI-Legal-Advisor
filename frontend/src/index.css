@@ -1356,3 +1356,29 @@ textarea:focus {
   height: 90vh; /* or max-height: 90vh */
 }
 
+.flex-1 {
+  flex: 1;
+  overflow-y: auto; /* scroll only content */
+}
+
+.chat-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0px;
+}
+
+.chat-input-area {
+  position: sticky;
+  bottom: 0;
+  background: var(--background-color, #fff);
+  padding: 10px;
+  border-top: 1px solid var(--border-color, #ddd);
+  display: flex;
+  gap: 10px;
+}
