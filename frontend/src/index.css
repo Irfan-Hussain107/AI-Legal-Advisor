@@ -1330,4 +1330,5 @@ textarea:focus {
   height: 250px;
   margin-top: 0px;
   background-color: #fafafa;
+  cursor: text;
 }
