@@ -1423,3 +1423,41 @@ textarea:focus {
 .panel {
   margin: 0;      /* remove outer spacing */
 }
+.auth-buttons{
+  padding-left: 0px;
+  margin-left: 0px;
+}
+
+nav {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important; /* Prevent wrapping */
+}
+
+.nav-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 20px !important;
+  flex-wrap: nowrap !important; /* Keep items on same line */
+}
+
+nav ul {
+  display: flex !important;
+  gap: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  flex-wrap: nowrap !important;
+}
+
+.auth-buttons {
+  display: flex !important;
+  align-items: center !important;
+  white-space: nowrap !important; /* Prevent text wrapping */
+}
+
+.auth-link {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important; /* Prevent shrinking */
+}
