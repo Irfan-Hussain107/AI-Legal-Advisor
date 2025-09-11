@@ -14,12 +14,23 @@ const BackgroundEffects = () => {
 
 const Header = ({ activePage, setActivePage }) => {
     const navItems = ['Home', 'Dashboard', 'Profile'];
+    const [selectedLanguage, setSelectedLanguage] = useState('EN');
+    const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+    
+    const languages = [
+    { code: 'EN', name: 'English' },
+    { code: 'HI', name: 'हिन्दी' }, // Hindi
+    { code: 'BN', name: 'বাংলা' }, // Bengali 
+    { code: 'TA', name: 'தமிழ்' }, // Tamil
+    { code: 'TE', name: 'తెలుగు' } // Telugu
+];
+
+
     return (
         <header>
             <nav>
                 <div className="logo">LegalAlly AI</div>
                 
-                {/* Group nav items and auth buttons together */}
                 <div className="nav-right">
                     <ul>
                         {navItems.map(item => (
@@ -40,6 +51,32 @@ const Header = ({ activePage, setActivePage }) => {
                         ))}
                     </ul>
                     
+                    {/* Clean Language Selector */}
+                    <div className="language-selector" onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}>
+                        <span className="current-lang">{selectedLanguage}</span>
+                        <svg className="lang-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                        
+                        {isLanguageDropdownOpen && (
+                            <div className="lang-menu">
+                                {languages.map(lang => (
+                                    <div
+                                        key={lang.code}
+                                        className={`lang-item ${selectedLanguage === lang.code ? 'active' : ''}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedLanguage(lang.code);
+                                            setIsLanguageDropdownOpen(false);
+                                        }}
+                                    >
+                                        {lang.name}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    
                     <div className="auth-buttons">
                         <a href="#signin" className="auth-link signin">Sign In/Register</a>
                     </div>
@@ -48,6 +85,7 @@ const Header = ({ activePage, setActivePage }) => {
         </header>
     );
 };
+
 
 function App() {
     const [activePage, setActivePage] = useState('home');
