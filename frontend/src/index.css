@@ -1353,7 +1353,13 @@ textarea:focus {
 
 .dashboard-layout{
   display: flex;
-  height: 90vh; /* or max-height: 90vh */
+  height: 85vh; /* or max-height: 90vh */
+}
+
+.panel {
+  flex: 1;       /* make left and right panels share space */
+  margin: 0;
+  overflow: auto; /* scroll if content exceeds */
 }
 
 .flex-1 {
@@ -1420,9 +1426,6 @@ textarea:focus {
   gap: 0px;           /* tighten button spacing if needed */
 }
 
-.panel {
-  margin: 0;      /* remove outer spacing */
-}
 .auth-buttons{
   padding-left: 0px;
   margin-left: 0px;
