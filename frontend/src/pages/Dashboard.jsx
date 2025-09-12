@@ -203,13 +203,26 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
         );
     };
 
-    const renderChatbot = () => (
+const renderChatbot = () => {
+    const messagesEndRef = useRef(null);
+
+    // Scroll to bottom whenever chatMessages change
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [chatMessages]);
+
+    return (
         <div className="chat-layout">
             <div className="chat-container">
                 {chatMessages.map((msg, index) => (
-                    <div key={index} className={`chat-message ${msg.type}`}>{msg.message}</div>
+                    <div key={index} className={`chat-message ${msg.type}`}>
+                        {msg.message}
+                    </div>
                 ))}
+                {/* invisible anchor to scroll to */}
+                <div ref={messagesEndRef} />
             </div>
+
             <div className="chat-input-area">
                 <input
                     type="text"
@@ -219,19 +232,16 @@ const DashboardPage = ({ activeMode, setActiveMode, analysisResult, fileData }) 
                     placeholder="Ask a question about your document..."
                 />
                 <button className="mic-button" onClick={() => console.log("Mic clicked!")}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 1a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                    <line x1="12" y1="19" x2="12" y2="23"></line>
-                    <line x1="8" y1="23" x2="16" y2="23"></line>
-                    </svg>
+                    🎤
                 </button>
                 <button onClick={handleSendMessage} className="send-button" disabled={isBotReplying}>
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    ➤
                 </button>
             </div>
         </div>
     );
+};
+
 
     const renderComparison = () => (
          <div className="animated-content comparison-section">
