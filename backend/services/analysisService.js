@@ -202,7 +202,7 @@ ${analysisText}`;
                 console.log(`Calling Gemini API (${4 - retries}/3 attempts)...`);
                
                 const model = genAI.getGenerativeModel({
-                    model: "gemini-1.5-flash",
+                    model: "gemini-2.5-flash",
                     generationConfig: {
                         temperature: 0.1,
                         topP: 0.8,
